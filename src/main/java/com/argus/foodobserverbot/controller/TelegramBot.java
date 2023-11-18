@@ -1,6 +1,8 @@
 package com.argus.foodobserverbot.controller;
 
+import jakarta.annotation.PostConstruct;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -12,29 +14,35 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 @Log4j2
 public class TelegramBot extends TelegramLongPollingBot {
     @Value("${bot.token}")
-    private String botToken;
+    private String token;
     @Value("${bot.name}")
-    private String botName;
+    private String name;
+
+    private final UpdateController updateController;
+
+    public TelegramBot(UpdateController updateController) {
+        this.updateController = updateController;
+    }
+
+    @PostConstruct
+    public void init() {
+        updateController.registerBot(this);
+    }
+
+
+    @Override
+    public void onUpdateReceived(Update update) {
+        updateController.processUpdate(update);
+    }
 
     @Override
     public String getBotUsername() {
-        return botName;
+        return name;
     }
 
     @Override
     public String getBotToken() {
-        return botToken;
-    }
-
-    @Override
-    public void onUpdateReceived(Update update) {
-        var originalMessage = update.getMessage();
-        log.debug(originalMessage.getText());
-
-        var response = new SendMessage();
-        response.setChatId(originalMessage.getChatId().toString());
-        response.setText("Hello from bot");
-        sendAnswerMessage(response);
+        return token;
     }
 
     public void sendAnswerMessage(SendMessage message) {

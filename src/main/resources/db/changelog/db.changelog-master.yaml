@@ -1,0 +1,5 @@
+databaseChangeLog:
+  - include:
+      file: db/changelog/changeset/create-table-food_record.sql
+  - include:
+      file: db/changelog/changeset/create-tables-bot_user.day.sql
