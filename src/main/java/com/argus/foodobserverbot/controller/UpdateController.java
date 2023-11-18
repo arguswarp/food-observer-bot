@@ -58,6 +58,6 @@ public class UpdateController {
 
 
     private void processTextMessage(Update update) {
-        setView(messageUtils.generateSendMessageWithText(update,mainService.processTextMessage(update)));
+        setView(messageUtils.generateSendMessageWithText(update, mainService.processTextMessage(update)));
     }
 }

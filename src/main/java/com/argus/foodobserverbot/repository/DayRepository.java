@@ -10,5 +10,6 @@ import java.util.Optional;
 @Repository
 public interface DayRepository extends JpaRepository<Day, Long> {
     Boolean existsDayByDateIs(LocalDate date);
+
     Optional<Day> findByDate(LocalDate date);
 }

@@ -103,7 +103,7 @@ public class MainServiceImpl implements MainService {
                 case IS_BLOOD -> {
                     var dayOptional = dayRepository.findByDate(LocalDate.now());
                     if (dayOptional.isPresent()) {
-                        var day= dayOptional.get();
+                        var day = dayOptional.get();
                         day.setIsBloody(true);
                         dayRepository.save(day);
                         return "Day's record is updated";
@@ -114,7 +114,7 @@ public class MainServiceImpl implements MainService {
                 case IS_PIMPLE -> {
                     var dayOptional = dayRepository.findByDate(LocalDate.now());
                     if (dayOptional.isPresent()) {
-                        var day= dayOptional.get();
+                        var day = dayOptional.get();
                         day.setIsPimple(true);
                         dayRepository.save(day);
                         return "Day's record is updated";
@@ -150,7 +150,10 @@ public class MainServiceImpl implements MainService {
         return """
                 List of available commands:\s
                 /cancel - cancel current command;
-                /registration - register user.""";
+                /day - start today's record;
+                /food - add food record;
+                /blood - changes the day to bloody;
+                /pimple - changes the day to pimple""";
     }
 
     private String unknown() {
