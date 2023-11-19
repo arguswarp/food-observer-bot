@@ -21,11 +21,11 @@ public class Day {
     @Column(name = "date")
     private LocalDate date;
 
-    @Column(name = "is_bloody")
-    private Boolean isBloody;
+    @Column(name = "bloody_rating")
+    private Integer bloodyRating;
 
-    @Column(name = "is_pimple")
-    private Boolean isPimple;
+    @Column(name = "pimple_rating")
+    private Integer pimpleRating;
     @OneToMany(mappedBy = "creationDay")
     private List<FoodRecord> foodRecords;
     @ManyToOne

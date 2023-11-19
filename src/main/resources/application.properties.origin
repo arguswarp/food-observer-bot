@@ -1,0 +1,14 @@
+#server properties
+server.port=
+
+#postgres properties
+spring.datasource.url=
+spring.datasource.username=
+spring.datasource.password=@ssw0rd
+spring.jpa.generate-ddl=
+spring.jpa.show-sql=
+spring.liquibase.enabled=
+
+#telegrambot properties
+bot.token=
+bot.name=

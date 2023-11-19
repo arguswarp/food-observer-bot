@@ -50,6 +50,7 @@ public class UpdateController {
 
     private void setUnsupportedMessageTypeView(Update update) {
         setView(messageUtils.generateSendMessageWithText(update, "Unsupported message type"));
+        log.error("Received unsupported message type " + update);
     }
 
     public void setView(SendMessage sendMessage) {
