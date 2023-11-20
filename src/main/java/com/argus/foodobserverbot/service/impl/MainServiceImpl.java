@@ -18,6 +18,7 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 
 import static com.argus.foodobserverbot.entity.enums.UserState.*;
+import static com.argus.foodobserverbot.service.enums.ServiceCommands.CANCEL;
 
 @Service
 @Log4j2
@@ -40,6 +41,9 @@ public class MainServiceImpl implements MainService {
         var botUser = findOrSaveAppUser(update);
         var userState = botUser.getUserState();
         var text = update.getMessage().getText();
+        if (text.equals(CANCEL.getCommand())) {
+            return cancelProcess(botUser);
+        }
         switch (userState) {
             case BASIC_STATE -> {
                 return processServiceCommand(botUser, text);
@@ -60,6 +64,8 @@ public class MainServiceImpl implements MainService {
                 var day = dayOptional.get();
                 day.setBloodyRating(Integer.parseInt(text));
                 dayRepository.save(day);
+                botUser.setUserState(BASIC_STATE);
+                botUserRepository.save(botUser);
                 return "Bloody rating is updated";
             }
             case WAIT_FOR_INPUT_PIMPLE -> {
@@ -67,6 +73,8 @@ public class MainServiceImpl implements MainService {
                 var day = dayOptional.get();
                 day.setPimpleRating(Integer.parseInt(text));
                 dayRepository.save(day);
+                botUser.setUserState(BASIC_STATE);
+                botUserRepository.save(botUser);
                 return "Pimple rating is updated";
             }
             default -> {

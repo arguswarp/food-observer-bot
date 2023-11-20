@@ -5,3 +5,5 @@ databaseChangeLog:
       file: db/changelog/changeset/create-tables-bot_user.day.sql
   - include:
       file: db/changelog/changeset/alter-table-day.ratings.sql
+  - include:
+      file: db/changelog/changeset/alter-table-food_record.food.length.sql
