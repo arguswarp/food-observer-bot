@@ -1,13 +1,14 @@
 -- liquibase formatted sql
 -- changeset argus:3
 alter table day
-    rename column is_bloody to bloody_rating;
+    add column bloody_rating smallint;
 
 alter table day
-    alter column bloody_rating type smallint using bloody_rating::smallint;
+    add column pimple_rating smallint;
 
 alter table day
-    rename column is_pimple to pimple_rating;
+    drop column is_bloody;
 
 alter table day
-    alter column pimple_rating type smallint using pimple_rating::smallint;
+    drop column is_pimple;
+

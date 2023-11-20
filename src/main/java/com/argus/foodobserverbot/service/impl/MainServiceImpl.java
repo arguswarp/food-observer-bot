@@ -17,8 +17,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-import static com.argus.foodobserverbot.entity.enums.UserState.BASIC_STATE;
-import static com.argus.foodobserverbot.entity.enums.UserState.WAIT_FOR_INPUT_FOOD;
+import static com.argus.foodobserverbot.entity.enums.UserState.*;
 
 @Service
 @Log4j2
@@ -55,6 +54,20 @@ public class MainServiceImpl implements MainService {
                 botUser.setUserState(BASIC_STATE);
                 botUserRepository.save(botUser);
                 return "You added food record";
+            }
+            case WAIT_FOR_INPUT_BLOOD -> {
+                var dayOptional = dayRepository.findByDate(LocalDate.now());
+                var day = dayOptional.get();
+                day.setBloodyRating(Integer.parseInt(text));
+                dayRepository.save(day);
+                return "Bloody rating is updated";
+            }
+            case WAIT_FOR_INPUT_PIMPLE -> {
+                var dayOptional = dayRepository.findByDate(LocalDate.now());
+                var day = dayOptional.get();
+                day.setPimpleRating(Integer.parseInt(text));
+                dayRepository.save(day);
+                return "Pimple rating is updated";
             }
             default -> {
                 log.error("Unknown user state " + userState);
@@ -93,6 +106,7 @@ public class MainServiceImpl implements MainService {
                     } else {
                         var day = Day.builder()
                                 .date(LocalDate.now())
+                                .creator(botUser)
                                 .build();
                         dayRepository.save(day);
                         botUser.setUserState(WAIT_FOR_INPUT_FOOD);
@@ -103,10 +117,9 @@ public class MainServiceImpl implements MainService {
                 case IS_BLOOD -> {
                     var dayOptional = dayRepository.findByDate(LocalDate.now());
                     if (dayOptional.isPresent()) {
-                        var day = dayOptional.get();
-                        day.setIsBloody(true);
-                        dayRepository.save(day);
-                        return "Day's record is updated";
+                        botUser.setUserState(WAIT_FOR_INPUT_BLOOD);
+                        botUserRepository.save(botUser);
+                        return "How bloody is the poop? From 0 to 10";
                     } else {
                         return "You haven't started today's record!";
                     }
@@ -114,10 +127,9 @@ public class MainServiceImpl implements MainService {
                 case IS_PIMPLE -> {
                     var dayOptional = dayRepository.findByDate(LocalDate.now());
                     if (dayOptional.isPresent()) {
-                        var day = dayOptional.get();
-                        day.setIsPimple(true);
-                        dayRepository.save(day);
-                        return "Day's record is updated";
+                        botUser.setUserState(WAIT_FOR_INPUT_PIMPLE);
+                        botUserRepository.save(botUser);
+                        return "How much pimples? From 0 to 10";
                     } else {
                         return "You haven't started today's record!";
                     }
