@@ -16,6 +16,7 @@ import org.telegram.telegrambots.meta.api.objects.User;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
+import java.util.function.Consumer;
 
 import static com.argus.foodobserverbot.entity.enums.UserState.*;
 import static com.argus.foodobserverbot.service.enums.ServiceCommands.CANCEL;
@@ -37,10 +38,8 @@ public class MainServiceImpl implements MainService {
     }
 
     @Override
-    public String processTextMessage(Update update) {
-        var botUser = findOrSaveAppUser(update);
+    public String processText(BotUser botUser, String text) {
         var userState = botUser.getUserState();
-        var text = update.getMessage().getText();
         if (text.equals(CANCEL.getCommand())) {
             return cancelProcess(botUser);
         }
@@ -60,28 +59,30 @@ public class MainServiceImpl implements MainService {
                 return "You added food record";
             }
             case WAIT_FOR_INPUT_BLOOD -> {
-                var dayOptional = dayRepository.findByDate(LocalDate.now());
-                var day = dayOptional.get();
-                day.setBloodyRating(Integer.parseInt(text));
-                dayRepository.save(day);
-                botUser.setUserState(BASIC_STATE);
-                botUserRepository.save(botUser);
-                return "Bloody rating is updated";
+                return setDayRatingToday(botUser,
+                        day -> day.setBloodyRating(Integer.parseInt(text)),
+                        "Bloody rating is updated");
             }
             case WAIT_FOR_INPUT_PIMPLE -> {
-                var dayOptional = dayRepository.findByDate(LocalDate.now());
-                var day = dayOptional.get();
-                day.setPimpleRating(Integer.parseInt(text));
-                dayRepository.save(day);
-                botUser.setUserState(BASIC_STATE);
-                botUserRepository.save(botUser);
-                return "Pimple rating is updated";
+                return setDayRatingToday(botUser,
+                        day -> day.setPimpleRating(Integer.parseInt(text))
+                        , "Pimple rating is updated");
             }
             default -> {
                 log.error("Unknown user state " + userState);
                 return "Unknown error! Enter /cancel and try again!";
             }
         }
+    }
+
+    private String setDayRatingToday(BotUser botUser, Consumer<Day> dayConsumer, String response) {
+        var dayOptional = dayRepository.findByDate(LocalDate.now());
+        var day = dayOptional.get();
+        dayConsumer.accept(day);
+        dayRepository.save(day);
+        botUser.setUserState(BASIC_STATE);
+        botUserRepository.save(botUser);
+        return response;
     }
 
     private String processServiceCommand(BotUser botUser, String command) {
@@ -146,24 +147,10 @@ public class MainServiceImpl implements MainService {
                     return cancelProcess(botUser);
                 }
             }
-            return unknown();
+            return unknown(command);
         } catch (RuntimeException e) {
-            return unknown();
+            return unknown(command);
         }
-    }
-
-    private BotUser findOrSaveAppUser(Update update) {
-        User telegramUser = update.getMessage().getFrom();
-        BotUser persistentBotUser = botUserRepository.findBotUserByTelegramId(telegramUser.getId());
-        if (persistentBotUser == null) {
-            BotUser transientAppUser = BotUser.builder()
-                    .telegramId(telegramUser.getId())
-                    .name(telegramUser.getUserName())
-                    .userState(BASIC_STATE)
-                    .build();
-            return botUserRepository.save(transientAppUser);
-        }
-        return persistentBotUser;
     }
 
     private String help() {
@@ -176,7 +163,8 @@ public class MainServiceImpl implements MainService {
                 /pimple - changes the day to pimple""";
     }
 
-    private String unknown() {
+    private String unknown(String command) {
+        log.error("Unknown command");
         return "Unknown command! Enter /help to see available commands";
     }
 

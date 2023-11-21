@@ -2,6 +2,7 @@ package com.argus.foodobserverbot.controller;
 
 
 import com.argus.foodobserverbot.service.MainService;
+import com.argus.foodobserverbot.service.UpdateService;
 import com.argus.foodobserverbot.utils.MessageUtils;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
@@ -18,9 +19,12 @@ public class UpdateController {
 
     private final MainService mainService;
 
-    public UpdateController(MessageUtils messageUtils, MainService mainService) {
+    private final UpdateService updateService;
+
+    public UpdateController(MessageUtils messageUtils, MainService mainService, UpdateService updateService) {
         this.messageUtils = messageUtils;
         this.mainService = mainService;
+        this.updateService = updateService;
     }
 
     public void registerBot(TelegramBot telegramBot) {
@@ -59,6 +63,7 @@ public class UpdateController {
 
 
     private void processTextMessage(Update update) {
-        setView(messageUtils.generateSendMessageWithText(update, mainService.processTextMessage(update)));
+        setView(messageUtils.generateSendMessageWithText(update,
+                mainService.processText(updateService.findOrSaveAppUser(update), update.getMessage().getText())));
     }
 }

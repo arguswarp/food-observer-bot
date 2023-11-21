@@ -1,7 +1,8 @@
 package com.argus.foodobserverbot.service;
 
+import com.argus.foodobserverbot.entity.BotUser;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 public interface MainService {
-    String processTextMessage(Update update);
+    String processText(BotUser botUser, String text);
 }
