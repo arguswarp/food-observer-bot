@@ -3,6 +3,7 @@ package com.argus.foodobserverbot.service.impl;
 import com.argus.foodobserverbot.entity.BotUser;
 import com.argus.foodobserverbot.entity.Day;
 import com.argus.foodobserverbot.entity.FoodRecord;
+import com.argus.foodobserverbot.exception.DatabaseException;
 import com.argus.foodobserverbot.repository.BotUserRepository;
 import com.argus.foodobserverbot.repository.DayRepository;
 import com.argus.foodobserverbot.repository.FoodRecordRepository;
@@ -10,8 +11,6 @@ import com.argus.foodobserverbot.service.MainService;
 import com.argus.foodobserverbot.service.enums.ServiceCommands;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
-import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.api.objects.User;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -51,7 +50,8 @@ public class MainServiceImpl implements MainService {
                 var foodRecord = FoodRecord.builder()
                         .food(text)
                         .createdAt(LocalDateTime.now())
-                        .creationDay(dayRepository.findByDate(LocalDate.now()).get())
+                        .creationDay(dayRepository.findByDate(LocalDate.now())
+                                .orElseThrow(() -> new DatabaseException("Can't find today")))
                         .build();
                 foodRecordRepository.save(foodRecord);
                 botUser.setUserState(BASIC_STATE);
@@ -77,7 +77,7 @@ public class MainServiceImpl implements MainService {
 
     private String setDayRatingToday(BotUser botUser, Consumer<Day> dayConsumer, String response) {
         var dayOptional = dayRepository.findByDate(LocalDate.now());
-        var day = dayOptional.get();
+        var day = dayOptional.orElseThrow(() -> new DatabaseException("Can't find today"));
         dayConsumer.accept(day);
         dayRepository.save(day);
         botUser.setUserState(BASIC_STATE);
@@ -164,7 +164,7 @@ public class MainServiceImpl implements MainService {
     }
 
     private String unknown(String command) {
-        log.error("Unknown command");
+        log.error("Unknown command: " + command);
         return "Unknown command! Enter /help to see available commands";
     }
 

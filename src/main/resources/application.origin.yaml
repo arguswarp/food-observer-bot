@@ -1,0 +1,15 @@
+server:
+  port:
+spring:
+  datasource:
+    url:
+    username:
+    password:
+  jpa:
+    generate-ddl:
+    show-sql:
+  liquibase:
+    enabled:
+bot:
+  token:
+  name:
