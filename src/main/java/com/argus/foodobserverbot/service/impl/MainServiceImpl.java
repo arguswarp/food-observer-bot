@@ -3,6 +3,7 @@ package com.argus.foodobserverbot.service.impl;
 import com.argus.foodobserverbot.entity.BotUser;
 import com.argus.foodobserverbot.entity.Day;
 import com.argus.foodobserverbot.entity.FoodRecord;
+import com.argus.foodobserverbot.entity.enums.UserState;
 import com.argus.foodobserverbot.exception.DatabaseException;
 import com.argus.foodobserverbot.repository.BotUserRepository;
 import com.argus.foodobserverbot.repository.DayRepository;
@@ -18,7 +19,7 @@ import java.util.Objects;
 import java.util.function.Consumer;
 
 import static com.argus.foodobserverbot.entity.enums.UserState.*;
-import static com.argus.foodobserverbot.service.enums.ServiceCommands.CANCEL;
+import static com.argus.foodobserverbot.service.enums.ServiceCommands.*;
 
 @Service
 @Log4j2
@@ -40,7 +41,7 @@ public class MainServiceImpl implements MainService {
     public String processText(BotUser botUser, String text) {
         var userState = botUser.getUserState();
         if (text.equals(CANCEL.getCommand())) {
-            return cancelProcess(botUser);
+            return cancel(botUser);
         }
         switch (userState) {
             case BASIC_STATE -> {
@@ -56,6 +57,9 @@ public class MainServiceImpl implements MainService {
                 foodRecordRepository.save(foodRecord);
                 botUser.setUserState(BASIC_STATE);
                 botUserRepository.save(botUser);
+                log.info("User " + botUser.getName()
+                        + " called: new food input"
+                        + " new state is: " + botUser.getUserState());
                 return "You added food record";
             }
             case WAIT_FOR_INPUT_BLOOD -> {
@@ -77,11 +81,17 @@ public class MainServiceImpl implements MainService {
 
     private String setDayRatingToday(BotUser botUser, Consumer<Day> dayConsumer, String response) {
         var dayOptional = dayRepository.findByDate(LocalDate.now());
-        var day = dayOptional.orElseThrow(() -> new DatabaseException("Can't find today"));
+        var day = dayOptional.orElseThrow(() -> {
+            log.error("Today is not present after day record was started");
+            return new DatabaseException("Can't find today");
+        });
         dayConsumer.accept(day);
         dayRepository.save(day);
         botUser.setUserState(BASIC_STATE);
         botUserRepository.save(botUser);
+        log.info("User " + botUser.getName()
+                + " called: setDayRating"
+                + " new state is: " + botUser.getUserState());
         return response;
     }
 
@@ -90,10 +100,11 @@ public class MainServiceImpl implements MainService {
             var serviceCommand = ServiceCommands.getServiceCommandByValue(command);
             switch (Objects.requireNonNull(serviceCommand)) {
                 case HELP -> {
-                    return help();
+                    return help(botUser);
                 }
                 case START -> {
-                    return "Hello there! Enter /help to see available commands";
+                    return "Hello there, " + botUser.getName() + "!"
+                            + " Enter /help to see available commands";
                 }
                 case DAY -> {
                     if (dayRepository.existsDayByDateIs(LocalDate.now())) {
@@ -104,6 +115,9 @@ public class MainServiceImpl implements MainService {
                                 .creator(botUser)
                                 .build();
                         dayRepository.save(day);
+                        log.info("User " + botUser.getName()
+                                + " called: " + DAY.getCommand()
+                                + " new state is: " + botUser.getUserState());
                         return "You have started this day's record";
                     }
                 }
@@ -111,6 +125,9 @@ public class MainServiceImpl implements MainService {
                     if (dayRepository.existsDayByDateIs(LocalDate.now())) {
                         botUser.setUserState(WAIT_FOR_INPUT_FOOD);
                         botUserRepository.save(botUser);
+                        log.info("User " + botUser.getName()
+                                + " called: " + FOOD_RECORD.getCommand()
+                                + " new state is: " + botUser.getUserState());
                         return "Enter food";
                     } else {
                         var day = Day.builder()
@@ -120,31 +137,22 @@ public class MainServiceImpl implements MainService {
                         dayRepository.save(day);
                         botUser.setUserState(WAIT_FOR_INPUT_FOOD);
                         botUserRepository.save(botUser);
+                        log.info("User " + botUser.getName()
+                                + " called: " + FOOD_RECORD.getCommand()
+                                + " new state is: " + botUser.getUserState());
                         return "You have started this day's record. Enter food";
                     }
                 }
                 case IS_BLOOD -> {
-                    var dayOptional = dayRepository.findByDate(LocalDate.now());
-                    if (dayOptional.isPresent()) {
-                        botUser.setUserState(WAIT_FOR_INPUT_BLOOD);
-                        botUserRepository.save(botUser);
-                        return "How bloody is the poop? From 0 to 10";
-                    } else {
-                        return "You haven't started today's record!";
-                    }
+                    return askForRatingAndChangeState(botUser, WAIT_FOR_INPUT_BLOOD,
+                            "How bloody is the poop? From 0 to 10");
                 }
                 case IS_PIMPLE -> {
-                    var dayOptional = dayRepository.findByDate(LocalDate.now());
-                    if (dayOptional.isPresent()) {
-                        botUser.setUserState(WAIT_FOR_INPUT_PIMPLE);
-                        botUserRepository.save(botUser);
-                        return "How much pimples? From 0 to 10";
-                    } else {
-                        return "You haven't started today's record!";
-                    }
+                    return askForRatingAndChangeState(botUser, WAIT_FOR_INPUT_PIMPLE,
+                            "How much pimples? From 0 to 10");
                 }
                 case CANCEL -> {
-                    return cancelProcess(botUser);
+                    return cancel(botUser);
                 }
             }
             return unknown(command);
@@ -153,7 +161,21 @@ public class MainServiceImpl implements MainService {
         }
     }
 
-    private String help() {
+    private String askForRatingAndChangeState(BotUser botUser, UserState state, String message) {
+        var dayOptional = dayRepository.findByDate(LocalDate.now());
+        if (dayOptional.isPresent()) {
+            botUser.setUserState(state);
+            botUserRepository.save(botUser);
+            return message;
+        } else {
+            return "You haven't started today's record!";
+        }
+    }
+
+    private String help(BotUser botUser) {
+        log.info("User " + botUser.getName()
+                + " called: " + HELP.getCommand()
+                + " state is: " + botUser.getUserState());
         return """
                 List of available commands:\s
                 /cancel - cancel current command;
@@ -168,9 +190,12 @@ public class MainServiceImpl implements MainService {
         return "Unknown command! Enter /help to see available commands";
     }
 
-    private String cancelProcess(BotUser botUser) {
+    private String cancel(BotUser botUser) {
         botUser.setUserState(BASIC_STATE);
         botUserRepository.save(botUser);
+        log.info("User " + botUser.getName()
+                + " called: " + CANCEL.getCommand()
+                + " state is: " + botUser.getUserState());
         return "Command canceled!";
     }
 }
