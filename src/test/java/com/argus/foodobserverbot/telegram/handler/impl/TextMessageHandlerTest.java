@@ -1,4 +1,4 @@
-package com.argus.foodobserverbot.service.impl;
+package com.argus.foodobserverbot.telegram.handler.impl;
 
 import com.argus.foodobserverbot.entity.BotUser;
 import com.argus.foodobserverbot.entity.Day;
@@ -16,12 +16,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Optional;
 
 import static com.argus.foodobserverbot.entity.enums.UserState.BASIC_STATE;
-import static com.argus.foodobserverbot.entity.enums.UserState.WAIT_FOR_INPUT_FOOD;
-import static com.argus.foodobserverbot.service.enums.ServiceCommands.*;
+import static com.argus.foodobserverbot.entity.enums.UserState.INPUT_FOOD;
+import static com.argus.foodobserverbot.telegram.enums.ServiceCommands.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(MockitoExtension.class)
-class MainServiceImplTest {
+class TextMessageHandlerTest {
     @Mock
     private BotUserRepository botUserRepository;
     @Mock
@@ -29,7 +29,7 @@ class MainServiceImplTest {
     @Mock
     private FoodRecordRepository foodRecordRepository;
     @InjectMocks
-    private MainServiceImpl mainService;
+    private TextMessageHandler mainService;
 
     @Test
     void WhenCancelTextMessage_ReturnCancelMessage() {
@@ -74,7 +74,7 @@ class MainServiceImplTest {
         Mockito.when(dayRepository.findByDate(Mockito.any())).thenReturn(Optional.of(new Day()));
 
         assertEquals("Enter food", mainService.processText(botUser, textToProcess));
-        assertEquals(WAIT_FOR_INPUT_FOOD, botUser.getUserState());
+        assertEquals(INPUT_FOOD, botUser.getUserState());
 
         textToProcess = "mock food";
         assertEquals("You added food record", mainService.processText(botUser, textToProcess));

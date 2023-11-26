@@ -1,4 +1,6 @@
-package com.argus.foodobserverbot.service.enums;
+package com.argus.foodobserverbot.telegram.enums;
+
+import com.argus.foodobserverbot.exception.UnknownServiceCommandException;
 
 public enum ServiceCommands {
     HELP("/help"),
@@ -6,6 +8,8 @@ public enum ServiceCommands {
     FOOD_RECORD("/food"),
     IS_BLOOD("/blood"),
     IS_PIMPLE("/pimple"),
+    PIMPLE_FACE("/face"),
+    PIMPLE_BOOTY("/booty"),
     CANCEL("/cancel"),
     START("/start");
     private final String command;
@@ -22,7 +26,7 @@ public enum ServiceCommands {
         for (ServiceCommands c : ServiceCommands.values()) {
             if (c.equals(command)) return c;
         }
-        return null;
+        throw new UnknownServiceCommandException("Unknown command");
     }
 
     public boolean equals(String command) {

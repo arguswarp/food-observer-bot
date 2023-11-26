@@ -1,6 +1,6 @@
 package com.argus.foodobserverbot.config;
 
-import com.argus.foodobserverbot.controller.TelegramBot;
+import com.argus.foodobserverbot.telegram.TelegramBot;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.telegram.telegrambots.meta.TelegramBotsApi;

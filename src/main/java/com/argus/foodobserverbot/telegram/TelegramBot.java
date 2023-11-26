@@ -1,5 +1,6 @@
-package com.argus.foodobserverbot.controller;
+package com.argus.foodobserverbot.telegram;
 
+import com.argus.foodobserverbot.controller.UpdateController;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,7 +12,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 @Component
 @Log4j2
-public class TelegramBot extends TelegramLongPollingBot {
+public class TelegramBot extends TelegramLongPollingBot{
     @Value("${bot.token}")
     private String token;
     @Value("${bot.name}")
@@ -23,15 +24,9 @@ public class TelegramBot extends TelegramLongPollingBot {
         this.updateController = updateController;
     }
 
-    @PostConstruct
-    public void init() {
-        updateController.registerBot(this);
-    }
-
-
     @Override
     public void onUpdateReceived(Update update) {
-        updateController.processUpdate(update);
+        sendAnswerMessage(updateController.processUpdate(update));
     }
 
     @Override

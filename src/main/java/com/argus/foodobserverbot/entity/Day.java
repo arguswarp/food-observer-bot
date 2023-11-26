@@ -24,8 +24,11 @@ public class Day {
     @Column(name = "bloody_rating")
     private Integer bloodyRating;
 
-    @Column(name = "pimple_rating")
-    private Integer pimpleRating;
+    @Column(name = "pimple_face_rating")
+    private Integer pimpleFaceRating;
+
+    @Column(name = "pimple_booty_rating")
+    private Integer pimpleBootyRating;
     @OneToMany(mappedBy = "creationDay")
     private List<FoodRecord> foodRecords;
     @ManyToOne

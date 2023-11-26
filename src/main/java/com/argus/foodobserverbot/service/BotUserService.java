@@ -11,10 +11,10 @@ import static com.argus.foodobserverbot.entity.enums.UserState.BASIC_STATE;
 
 @Service
 @Log4j2
-public class UpdateService {
+public class BotUserService {
     private final BotUserRepository botUserRepository;
 
-    public UpdateService(BotUserRepository botUserRepository) {
+    public BotUserService(BotUserRepository botUserRepository) {
         this.botUserRepository = botUserRepository;
     }
 

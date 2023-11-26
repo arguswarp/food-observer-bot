@@ -1,17 +1,20 @@
-package com.argus.foodobserverbot.service.impl;
+package com.argus.foodobserverbot.telegram.handler.impl;
 
 import com.argus.foodobserverbot.entity.BotUser;
 import com.argus.foodobserverbot.entity.Day;
 import com.argus.foodobserverbot.entity.FoodRecord;
 import com.argus.foodobserverbot.entity.enums.UserState;
 import com.argus.foodobserverbot.exception.DatabaseException;
+import com.argus.foodobserverbot.exception.UnknownServiceCommandException;
 import com.argus.foodobserverbot.repository.BotUserRepository;
 import com.argus.foodobserverbot.repository.DayRepository;
 import com.argus.foodobserverbot.repository.FoodRecordRepository;
-import com.argus.foodobserverbot.service.MainService;
-import com.argus.foodobserverbot.service.enums.ServiceCommands;
+import com.argus.foodobserverbot.telegram.enums.ServiceCommands;
+import com.argus.foodobserverbot.telegram.handler.UpdateHandler;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -19,11 +22,11 @@ import java.util.Objects;
 import java.util.function.Consumer;
 
 import static com.argus.foodobserverbot.entity.enums.UserState.*;
-import static com.argus.foodobserverbot.service.enums.ServiceCommands.*;
+import static com.argus.foodobserverbot.telegram.enums.ServiceCommands.*;
 
 @Service
 @Log4j2
-public class MainServiceImpl implements MainService {
+public class TextMessageHandler implements UpdateHandler {
 
     private final BotUserRepository botUserRepository;
 
@@ -31,7 +34,7 @@ public class MainServiceImpl implements MainService {
 
     private final FoodRecordRepository foodRecordRepository;
 
-    public MainServiceImpl(BotUserRepository botUserRepository, DayRepository dayRepository, FoodRecordRepository foodRecordRepository) {
+    public TextMessageHandler(BotUserRepository botUserRepository, DayRepository dayRepository, FoodRecordRepository foodRecordRepository) {
         this.botUserRepository = botUserRepository;
         this.dayRepository = dayRepository;
         this.foodRecordRepository = foodRecordRepository;
@@ -47,7 +50,7 @@ public class MainServiceImpl implements MainService {
             case BASIC_STATE -> {
                 return processServiceCommand(botUser, text);
             }
-            case WAIT_FOR_INPUT_FOOD -> {
+            case INPUT_FOOD -> {
                 var foodRecord = FoodRecord.builder()
                         .food(text)
                         .createdAt(LocalDateTime.now())
@@ -62,14 +65,19 @@ public class MainServiceImpl implements MainService {
                         + " new state is: " + botUser.getUserState());
                 return "You added food record";
             }
-            case WAIT_FOR_INPUT_BLOOD -> {
+            case INPUT_BLOOD_RATE -> {
                 return setDayRatingToday(botUser,
                         day -> day.setBloodyRating(Integer.parseInt(text)),
                         "Bloody rating is updated");
             }
-            case WAIT_FOR_INPUT_PIMPLE -> {
+            case INPUT_PIMPLE_RATE_FACE -> {
                 return setDayRatingToday(botUser,
-                        day -> day.setPimpleRating(Integer.parseInt(text))
+                        day -> day.setPimpleFaceRating(Integer.parseInt(text))
+                        , "Pimple rating is updated");
+            }
+            case INPUT_PIMPLE_RATE_BOOTY -> {
+                return setDayRatingToday(botUser,
+                        day -> day.setPimpleBootyRating(Integer.parseInt(text))
                         , "Pimple rating is updated");
             }
             default -> {
@@ -91,7 +99,7 @@ public class MainServiceImpl implements MainService {
         botUserRepository.save(botUser);
         log.info("User " + botUser.getName()
                 + " called: setDayRating"
-                + " new state is: " + botUser.getUserState());
+                + " state is: " + botUser.getUserState());
         return response;
     }
 
@@ -123,7 +131,7 @@ public class MainServiceImpl implements MainService {
                 }
                 case FOOD_RECORD -> {
                     if (dayRepository.existsDayByDateIs(LocalDate.now())) {
-                        botUser.setUserState(WAIT_FOR_INPUT_FOOD);
+                        botUser.setUserState(INPUT_FOOD);
                         botUserRepository.save(botUser);
                         log.info("User " + botUser.getName()
                                 + " called: " + FOOD_RECORD.getCommand()
@@ -135,7 +143,7 @@ public class MainServiceImpl implements MainService {
                                 .creator(botUser)
                                 .build();
                         dayRepository.save(day);
-                        botUser.setUserState(WAIT_FOR_INPUT_FOOD);
+                        botUser.setUserState(INPUT_FOOD);
                         botUserRepository.save(botUser);
                         log.info("User " + botUser.getName()
                                 + " called: " + FOOD_RECORD.getCommand()
@@ -144,11 +152,22 @@ public class MainServiceImpl implements MainService {
                     }
                 }
                 case IS_BLOOD -> {
-                    return askForRatingAndChangeState(botUser, WAIT_FOR_INPUT_BLOOD,
+                    return askAndChangeState(botUser, INPUT_BLOOD_RATE,
                             "How bloody is the poop? From 0 to 10");
                 }
                 case IS_PIMPLE -> {
-                    return askForRatingAndChangeState(botUser, WAIT_FOR_INPUT_PIMPLE,
+                    return askAndChangeState(botUser, BASIC_STATE,
+                            "Choose where the pimples are: "
+                                    + PIMPLE_FACE.getCommand()
+                                    + " or "
+                                    + PIMPLE_BOOTY.getCommand());
+                }
+                case PIMPLE_FACE -> {
+                    return askAndChangeState(botUser, INPUT_PIMPLE_RATE_FACE,
+                            "How much pimples? From 0 to 10");
+                }
+                case PIMPLE_BOOTY -> {
+                    return askAndChangeState(botUser, INPUT_PIMPLE_RATE_BOOTY,
                             "How much pimples? From 0 to 10");
                 }
                 case CANCEL -> {
@@ -156,12 +175,12 @@ public class MainServiceImpl implements MainService {
                 }
             }
             return unknown(command);
-        } catch (RuntimeException e) {
+        } catch (UnknownServiceCommandException e) {
             return unknown(command);
         }
     }
 
-    private String askForRatingAndChangeState(BotUser botUser, UserState state, String message) {
+    private String askAndChangeState(BotUser botUser, UserState state, String message) {
         var dayOptional = dayRepository.findByDate(LocalDate.now());
         if (dayOptional.isPresent()) {
             botUser.setUserState(state);
