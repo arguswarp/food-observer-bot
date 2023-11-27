@@ -1,7 +1,6 @@
 package com.argus.foodobserverbot.telegram;
 
 import com.argus.foodobserverbot.controller.UpdateController;
-import jakarta.annotation.PostConstruct;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -12,12 +11,11 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 @Component
 @Log4j2
-public class TelegramBot extends TelegramLongPollingBot{
+public class TelegramBot extends TelegramLongPollingBot {
     @Value("${bot.token}")
     private String token;
     @Value("${bot.name}")
     private String name;
-
     private final UpdateController updateController;
 
     public TelegramBot(UpdateController updateController) {
