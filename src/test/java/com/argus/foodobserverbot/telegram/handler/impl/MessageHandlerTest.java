@@ -21,7 +21,7 @@ import static com.argus.foodobserverbot.telegram.enums.ServiceCommands.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(MockitoExtension.class)
-class TextMessageHandlerTest {
+class MessageHandlerTest {
     @Mock
     private BotUserRepository botUserRepository;
     @Mock
@@ -29,7 +29,7 @@ class TextMessageHandlerTest {
     @Mock
     private FoodRecordRepository foodRecordRepository;
     @InjectMocks
-    private TextMessageHandler mainService;
+    private MessageHandler mainService;
 
     @Test
     void WhenCancelTextMessage_ReturnCancelMessage() {
@@ -41,7 +41,7 @@ class TextMessageHandlerTest {
                 .build();
         String textToProcess = CANCEL.getCommand();
         Mockito.when(botUserRepository.save(Mockito.any(BotUser.class))).thenReturn(botUser);
-        assertEquals("Command canceled!", mainService.processText(botUser, textToProcess));
+        assertEquals("Command canceled!", mainService.handleUpdate(botUser, textToProcess));
     }
 
     @Test
@@ -55,7 +55,7 @@ class TextMessageHandlerTest {
         String textToProcess = DAY.getCommand();
         Mockito.when(dayRepository.existsDayByDateIs(Mockito.any())).thenReturn(false);
         Mockito.when(dayRepository.save(Mockito.any(Day.class))).thenReturn(Day.builder().build());
-        assertEquals("You have started this day's record", mainService.processText(botUser, textToProcess));
+        assertEquals("You have started this day's record", mainService.handleUpdate(botUser, textToProcess));
     }
 
     @Test
@@ -73,11 +73,11 @@ class TextMessageHandlerTest {
         Mockito.when(dayRepository.existsDayByDateIs(Mockito.any())).thenReturn(true);
         Mockito.when(dayRepository.findByDate(Mockito.any())).thenReturn(Optional.of(new Day()));
 
-        assertEquals("Enter food", mainService.processText(botUser, textToProcess));
+        assertEquals("Enter food", mainService.handleUpdate(botUser, textToProcess));
         assertEquals(INPUT_FOOD, botUser.getUserState());
 
         textToProcess = "mock food";
-        assertEquals("You added food record", mainService.processText(botUser, textToProcess));
+        assertEquals("You added food record", mainService.handleUpdate(botUser, textToProcess));
         assertEquals(BASIC_STATE, botUser.getUserState());
     }
 

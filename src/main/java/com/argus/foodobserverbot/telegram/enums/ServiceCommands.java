@@ -33,7 +33,7 @@ public enum ServiceCommands {
         for (ServiceCommands c : ServiceCommands.values()) {
             if (c.equals(command)) return c;
         }
-        throw new UnknownServiceCommandException("Unknown command");
+        throw new UnknownServiceCommandException("Unknown command: " + command);
     }
 
     public boolean equals(String command) {
