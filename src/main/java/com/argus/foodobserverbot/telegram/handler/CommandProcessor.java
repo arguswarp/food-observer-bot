@@ -9,7 +9,7 @@ import com.argus.foodobserverbot.repository.DayRepository;
 import com.argus.foodobserverbot.service.MenuService;
 import com.argus.foodobserverbot.telegram.enums.ServiceCommands;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Message;
@@ -21,7 +21,7 @@ import java.util.Objects;
 import static com.argus.foodobserverbot.entity.enums.UserState.*;
 import static com.argus.foodobserverbot.telegram.enums.ServiceCommands.*;
 
-@Service
+@Component
 @Log4j2
 public class CommandProcessor {
 
@@ -69,53 +69,38 @@ public class CommandProcessor {
                             .build();
                 }
                 case DAY -> {
-                    if (dayRepository.existsDayByDateIs(LocalDate.now())) {
-                        return SendMessage.builder()
-                                .chatId(chatId)
-                                .text("You have already started this day's record")
-                                .build();
-                    } else {
+                    if (!dayRepository.existsDayByDateIs(LocalDate.now())) {
                         var day = Day.builder()
                                 .date(LocalDate.now())
                                 .creator(botUser)
                                 .build();
                         dayRepository.save(day);
-                        log.info("User " + botUser.getName()
-                                + " called: " + DAY.getCommand()
-                                + " new state is: " + botUser.getUserState());
-                        return SendMessage.builder()
-                                .chatId(chatId)
-                                .text("You have started this day's record")
-                                .build();
                     }
+                    return SendMessage.builder()
+                            .chatId(chatId)
+                            .text("You have started this day's record")
+                            .build();
                 }
                 case FOOD_RECORD -> {
-                    if (dayRepository.existsDayByDateIs(LocalDate.now())) {
-                        botUser.setUserState(INPUT_FOOD);
-                        botUserRepository.save(botUser);
-                        log.info("User " + botUser.getName()
-                                + " called: " + FOOD_RECORD.getCommand()
-                                + " new state is: " + botUser.getUserState());
-                        return SendMessage.builder()
-                                .chatId(chatId)
-                                .text("Enter food")
-                                .build();
-                    } else {
+                    if (!dayRepository.existsDayByDateIs(LocalDate.now())) {
                         var day = Day.builder()
                                 .date(LocalDate.now())
                                 .creator(botUser)
                                 .build();
                         dayRepository.save(day);
-                        botUser.setUserState(INPUT_FOOD);
-                        botUserRepository.save(botUser);
-                        log.info("User " + botUser.getName()
-                                + " called: " + FOOD_RECORD.getCommand()
-                                + " new state is: " + botUser.getUserState());
-                        return SendMessage.builder()
-                                .chatId(chatId)
-                                .text("You have started this day's record. Enter food")
-                                .build();
                     }
+                    botUser.setUserState(INPUT_FOOD);
+                    botUserRepository.save(botUser);
+                    log.info("User " + botUser.getName()
+                            + " called: " + FOOD_RECORD.getCommand()
+                            + " new state is: " + botUser.getUserState());
+                    return SendMessage.builder()
+                            .chatId(chatId)
+                            .text("Enter food")
+                            .replyMarkup(menuService.createOneRowReplyKeyboard(
+                                    List.of("Cancel"),
+                                    List.of(CANCEL.getCommand())))
+                            .build();
                 }
                 case IS_BLOOD -> {
                     return SendMessage.builder()
