@@ -26,7 +26,7 @@ public class BotUserService {
         if (update.hasMessage()) {
             telegramUser = Optional.ofNullable(update.getMessage().getFrom());
         } else if (update.hasCallbackQuery()) {
-            telegramUser = Optional.ofNullable(update.getCallbackQuery().getMessage().getFrom());
+            telegramUser = Optional.ofNullable(update.getCallbackQuery().getFrom());
         }
         var user = telegramUser.orElseThrow(() -> new EmptyUpdateException("Update is empty"));
         var telegramId = user.getId();

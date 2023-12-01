@@ -2,6 +2,8 @@ package com.argus.foodobserverbot.telegram.enums;
 
 import com.argus.foodobserverbot.exception.UnknownServiceCommandException;
 
+import java.util.Arrays;
+
 public enum ServiceCommands {
     START("/start", "Starts the bot"),
     HELP("/help", "Shows commands"),
@@ -34,6 +36,11 @@ public enum ServiceCommands {
             if (c.equals(command)) return c;
         }
         throw new UnknownServiceCommandException("Unknown command: " + command);
+    }
+
+    public static boolean isCommand(String text) {
+       return Arrays.stream(ServiceCommands.values())
+               .anyMatch(serviceCommands -> serviceCommands.getCommand().equals(text));
     }
 
     public boolean equals(String command) {
