@@ -10,6 +10,7 @@ import com.argus.foodobserverbot.service.ExcelService;
 import com.argus.foodobserverbot.service.MenuService;
 import com.argus.foodobserverbot.telegram.enums.ServiceCommands;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendDocument;
@@ -28,12 +29,12 @@ import static com.argus.foodobserverbot.telegram.enums.ServiceCommands.*;
 @Component
 @Log4j2
 public class CommandProcessor {
-
     private final BotUserRepository botUserRepository;
     private final DayRepository dayRepository;
     private final MenuService menuService;
-
     private final ExcelService excelService;
+    @Value("${excel.path}")
+    private String EXCEL_PATH;
 
     public CommandProcessor(BotUserRepository botUserRepository, DayRepository dayRepository, MenuService menuService, ExcelService excelService) {
         this.botUserRepository = botUserRepository;
@@ -70,8 +71,8 @@ public class CommandProcessor {
                             .text("Hello there, " + botUser.getName() + "!"
                                     + " Enter /help to see available commands")
                             .replyMarkup(menuService.createOneRowReplyKeyboard(
-                                    List.of("Add food record", "Add pimples", "Help"),
-                                    List.of(FOOD_RECORD.getCommand(), IS_PIMPLE.getCommand(), HELP.getCommand())))
+                                    List.of("Add food record", "Add pimples","Get excel all data", "Help"),
+                                    List.of(FOOD_RECORD.getCommand(), IS_PIMPLE.getCommand(),EXCEL_ALL_DATA.getCommand(), HELP.getCommand())))
                             .build();
                 }
                 case DAY -> {
@@ -111,7 +112,7 @@ public class CommandProcessor {
                 case EXCEL_ALL_DATA -> {
                     return SendDocument.builder()
                             .chatId(chatId)
-                            .document(new InputFile(excelService.createExcelFileAllData("./excel-test/all_data.xlsx")))
+                            .document(new InputFile(excelService.createExcelFileAllData(EXCEL_PATH, botUser)))
                             .caption("Your file is ready " + botUser.getName())
                             .build();
                 }

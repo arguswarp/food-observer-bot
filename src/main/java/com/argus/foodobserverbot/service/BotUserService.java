@@ -17,7 +17,6 @@ import static com.argus.foodobserverbot.entity.enums.UserState.BASIC_STATE;
 @Log4j2
 public class BotUserService {
     private final BotUserRepository botUserRepository;
-
     public BotUserService(BotUserRepository botUserRepository) {
         this.botUserRepository = botUserRepository;
     }
@@ -40,6 +39,7 @@ public class BotUserService {
                     .name(name)
                     .userState(BASIC_STATE)
                     .build();
+            log.info("User is created: " + transientAppUser.getName() + " with id " + transientAppUser.getId());
             return botUserRepository.save(transientAppUser);
         }
         return persistentBotUser;

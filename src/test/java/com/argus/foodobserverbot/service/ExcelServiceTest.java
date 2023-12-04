@@ -1,5 +1,6 @@
 package com.argus.foodobserverbot.service;
 
+import com.argus.foodobserverbot.entity.BotUser;
 import com.argus.foodobserverbot.entity.Day;
 import com.argus.foodobserverbot.entity.FoodRecord;
 import com.argus.foodobserverbot.repository.DayRepository;
@@ -28,17 +29,10 @@ class ExcelServiceTest {
     @InjectMocks
     private ExcelService excelService;
 
-    private final String FILE_PATH = "./excel-test/test_table.xlsx";
+    private final String FILE_PATH = "excel-test";
 
     @Test
     void WhenCreateExcelFileAllData_FileIsCreated() {
-
-        try {
-            Files.deleteIfExists(Path.of(FILE_PATH));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
         List<FoodRecord> foodRecords1 = List.of(
                 FoodRecord.builder()
                         .food("pizza")
@@ -77,9 +71,11 @@ class ExcelServiceTest {
                         .pimpleFaceRating(1)
                         .build()
         );
+        BotUser user = BotUser.builder()
+                .name("Porfiriy")
+                .build();
+        Mockito.when(dayRepository.findAllByOrderByDateDesc()).thenReturn(dayRecords);
 
-        Mockito.when(dayRepository.findAll()).thenReturn(dayRecords);
-
-        excelService.createExcelFileAllData(FILE_PATH);
+        excelService.createExcelFileAllData(FILE_PATH, user);
     }
 }

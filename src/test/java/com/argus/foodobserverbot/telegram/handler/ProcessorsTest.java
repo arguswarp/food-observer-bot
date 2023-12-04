@@ -13,6 +13,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
@@ -55,8 +56,10 @@ class ProcessorsTest {
         message.setChat(new Chat(1234L, ""));
 
         Mockito.when(botUserRepository.save(Mockito.any(BotUser.class))).thenReturn(botUser);
-        assertEquals("1234", commandProcessor.process(message, botUser).getChatId());
-        assertEquals("Command canceled", commandProcessor.process(message, botUser).getText());
+
+        SendMessage sendMessage = (SendMessage) commandProcessor.process(message, botUser);
+        assertEquals("1234", sendMessage.getChatId());
+        assertEquals("Command canceled", sendMessage.getText());
     }
 
     @Test
@@ -75,9 +78,10 @@ class ProcessorsTest {
         Mockito.when(dayRepository.existsDayByDateIs(Mockito.any())).thenReturn(false);
         Mockito.when(dayRepository.save(Mockito.any(Day.class))).thenReturn(Day.builder().build());
 
-        assertEquals("1234", commandProcessor.process(message, botUser).getChatId());
+        SendMessage sendMessage = (SendMessage) commandProcessor.process(message, botUser);
+        assertEquals("1234", sendMessage.getChatId());
         assertEquals("You have started this day's record",
-                commandProcessor.process(message, botUser).getText());
+                sendMessage.getText());
     }
 
     @Test
@@ -100,7 +104,7 @@ class ProcessorsTest {
         Mockito.when(menuService.createOneRowReplyKeyboard(Mockito.any(), Mockito.any()))
                 .thenReturn(ReplyKeyboardMarkup.builder().build());
 
-        var sendMessage = commandProcessor.process(message, botUser);
+        SendMessage sendMessage = (SendMessage) commandProcessor.process(message, botUser);
 
         assertEquals("1234", sendMessage.getChatId());
         assertEquals("Enter food", sendMessage.getText());
