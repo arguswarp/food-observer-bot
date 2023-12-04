@@ -10,6 +10,7 @@ import com.argus.foodobserverbot.repository.FoodRecordRepository;
 import com.argus.foodobserverbot.service.MenuService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
@@ -23,6 +24,7 @@ import static com.argus.foodobserverbot.telegram.enums.ServiceCommands.CANCEL;
 
 @Component
 @Log4j2
+@Transactional
 public class UserStateProcessor {
     private final DayRepository dayRepository;
 
@@ -59,7 +61,7 @@ public class UserStateProcessor {
                         + " new state is: " + botUser.getUserState());
                 return SendMessage.builder()
                         .chatId(chatId)
-                        .text(text)
+                        .text("You added food record")
                         .build();
             }
             case INPUT_BLOOD_RATE -> {

@@ -5,6 +5,7 @@ import com.argus.foodobserverbot.exception.EmptyUpdateException;
 import com.argus.foodobserverbot.repository.BotUserRepository;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 
@@ -21,6 +22,7 @@ public class BotUserService {
         this.botUserRepository = botUserRepository;
     }
 
+    @Transactional
     public BotUser findOrSaveAppUser(Update update) {
         Optional<User> telegramUser = Optional.empty();
         if (update.hasMessage()) {

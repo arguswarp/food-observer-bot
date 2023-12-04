@@ -1,11 +1,13 @@
 package com.argus.foodobserverbot.controller;
 
 
+import com.argus.foodobserverbot.exception.EmptyUpdateException;
 import com.argus.foodobserverbot.service.BotUserService;
 import com.argus.foodobserverbot.telegram.handler.impl.CallbackQueryHandler;
 import com.argus.foodobserverbot.telegram.handler.impl.MessageHandler;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
@@ -23,15 +25,15 @@ public class UpdateController {
         this.botUserService = botUserService;
     }
 
-    public SendMessage processUpdate(Update update) {
+    public PartialBotApiMethod<?> getUpdate(Update update) {
         if (update == null) {
             log.error("Received update is null");
-            throw new IllegalArgumentException("Update is null");
+            throw new EmptyUpdateException("Update is null");
         }
         var botUser = botUserService.findOrSaveAppUser(update);
         if (update.hasCallbackQuery()) {
             return callbackQueryHandler.handleUpdate(update.getCallbackQuery(), botUser);
-        } else if (update.hasMessage()) {
+        } else if (update.hasMessage() && update.getMessage().hasText()) {
             return messageHandler.handleUpdate(update.getMessage(), botUser);
         } else {
             log.error("Received unsupported message type " + update);

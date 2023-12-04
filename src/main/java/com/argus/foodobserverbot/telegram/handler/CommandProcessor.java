@@ -6,12 +6,16 @@ import com.argus.foodobserverbot.entity.enums.UserState;
 import com.argus.foodobserverbot.exception.UnknownServiceCommandException;
 import com.argus.foodobserverbot.repository.BotUserRepository;
 import com.argus.foodobserverbot.repository.DayRepository;
+import com.argus.foodobserverbot.service.ExcelService;
 import com.argus.foodobserverbot.service.MenuService;
 import com.argus.foodobserverbot.telegram.enums.ServiceCommands;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.send.SendDocument;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
+import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
 import java.time.LocalDate;
@@ -27,28 +31,30 @@ public class CommandProcessor {
 
     private final BotUserRepository botUserRepository;
     private final DayRepository dayRepository;
-
     private final MenuService menuService;
 
-    public CommandProcessor(BotUserRepository botUserRepository, DayRepository dayRepository, MenuService menuService) {
+    private final ExcelService excelService;
+
+    public CommandProcessor(BotUserRepository botUserRepository, DayRepository dayRepository, MenuService menuService, ExcelService excelService) {
         this.botUserRepository = botUserRepository;
         this.dayRepository = dayRepository;
         this.menuService = menuService;
+        this.excelService = excelService;
     }
 
-    public SendMessage process(Message message, BotUser botUser) {
+    public PartialBotApiMethod<?> process(Message message, BotUser botUser) {
         var chatId = message.getChatId();
         var text = message.getText();
-        return process0(botUser, chatId, text);
+        return processServiceCommand(botUser, chatId, text);
     }
 
-    public SendMessage process(CallbackQuery callbackQuery, BotUser botUser) {
+    public PartialBotApiMethod<?> process(CallbackQuery callbackQuery, BotUser botUser) {
         var chatId = callbackQuery.getMessage().getChatId();
         var text = callbackQuery.getData();
-        return process0(botUser, chatId, text);
+        return processServiceCommand(botUser, chatId, text);
     }
 
-    private SendMessage process0(BotUser botUser, Long chatId, String text) {
+    private PartialBotApiMethod<?> processServiceCommand(BotUser botUser, Long chatId, String text) {
         try {
             var serviceCommand = ServiceCommands.getServiceCommandByValue(text);
             switch (Objects.requireNonNull(serviceCommand)) {
@@ -100,6 +106,13 @@ public class CommandProcessor {
                             .replyMarkup(menuService.createOneRowReplyKeyboard(
                                     List.of("Cancel"),
                                     List.of(CANCEL.getCommand())))
+                            .build();
+                }
+                case EXCEL_ALL_DATA -> {
+                    return SendDocument.builder()
+                            .chatId(chatId)
+                            .document(new InputFile(excelService.createExcelFileAllData("./excel-test/all_data.xlsx")))
+                            .caption("Your file is ready " + botUser.getName())
                             .build();
                 }
                 case IS_BLOOD -> {

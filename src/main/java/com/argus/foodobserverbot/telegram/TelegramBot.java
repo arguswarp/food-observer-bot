@@ -5,6 +5,8 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.send.SendDocument;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -24,7 +26,7 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-        sendAnswerMessage(updateController.processUpdate(update));
+        sendAnswerMessage(updateController.getUpdate(update));
     }
 
     @Override
@@ -37,10 +39,15 @@ public class TelegramBot extends TelegramLongPollingBot {
         return token;
     }
 
-    public void sendAnswerMessage(SendMessage message) {
+    public void sendAnswerMessage(PartialBotApiMethod<?> message) {
+
         if (message != null) {
             try {
-                execute(message);
+                if (message instanceof SendMessage) {
+                    execute((SendMessage)message);
+                } else if (message instanceof SendDocument) {
+                    execute((SendDocument) message);
+                }
             } catch (TelegramApiException e) {
                 log.error(e);
             }
