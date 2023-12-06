@@ -6,6 +6,8 @@ import java.util.Arrays;
 
 public enum ServiceCommands {
     START("/start", "Starts the bot"),
+    RECORD("/record", "Call menu to make day record"),
+    MODE("/mode", "Change record mode"),
     HELP("/help", "Shows commands"),
     CANCEL("/cancel", "Aborts selected command"),
     FOOD_RECORD("/food", "Adds food record"),

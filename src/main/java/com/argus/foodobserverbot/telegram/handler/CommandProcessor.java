@@ -15,9 +15,7 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendDocument;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
-import org.telegram.telegrambots.meta.api.objects.Message;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -42,20 +40,8 @@ public class CommandProcessor {
         this.menuService = menuService;
         this.excelService = excelService;
     }
-
-    public PartialBotApiMethod<?> process(Message message, BotUser botUser) {
-        var chatId = message.getChatId();
-        var text = message.getText();
-        return processServiceCommand(botUser, chatId, text);
-    }
-
-    public PartialBotApiMethod<?> process(CallbackQuery callbackQuery, BotUser botUser) {
-        var chatId = callbackQuery.getMessage().getChatId();
-        var text = callbackQuery.getData();
-        return processServiceCommand(botUser, chatId, text);
-    }
-
-    private PartialBotApiMethod<?> processServiceCommand(BotUser botUser, Long chatId, String text) {
+    //TODO: add previous day records
+    public PartialBotApiMethod<?> process(BotUser botUser, Long chatId, String text) {
         try {
             var serviceCommand = ServiceCommands.getServiceCommandByValue(text);
             switch (Objects.requireNonNull(serviceCommand)) {
@@ -71,8 +57,17 @@ public class CommandProcessor {
                             .text("Hello there, " + botUser.getName() + "!"
                                     + " Enter /help to see available commands")
                             .replyMarkup(menuService.createOneRowReplyKeyboard(
-                                    List.of("Add food record", "Add pimples","Get excel all data", "Help"),
-                                    List.of(FOOD_RECORD.getCommand(), IS_PIMPLE.getCommand(),EXCEL_ALL_DATA.getCommand(), HELP.getCommand())))
+                                    List.of("Add record", "Help"),
+                                    List.of(RECORD.getCommand(), HELP.getCommand())))
+                            .build();
+                }
+                case RECORD -> {
+                    return SendMessage.builder()
+                            .chatId(chatId)
+                            .text("Choose the record type to add")
+                            .replyMarkup(menuService.createOneRowReplyKeyboard(
+                                    List.of("Add food record", "Add pimples", "Change mode", "Get excel all data", "Cancel"),
+                                    List.of(FOOD_RECORD.getCommand(), IS_PIMPLE.getCommand(), MODE.getCommand(), EXCEL_ALL_DATA.getCommand(), CANCEL.getCommand())))
                             .build();
                 }
                 case DAY -> {
@@ -195,6 +190,7 @@ public class CommandProcessor {
         return message;
     }
 
+    //TODO: add new commands
     private String help(BotUser botUser) {
         log.info("User " + botUser.getName()
                 + " called: " + HELP.getCommand()

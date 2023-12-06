@@ -27,4 +27,6 @@ public class BotUser {
     private Long telegramId;
     @OneToMany(mappedBy = "creator")
     private List<Day> days;
+    @Transient
+    private Boolean todayMode = true;
 }

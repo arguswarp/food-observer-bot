@@ -13,3 +13,5 @@ spring:
 bot:
   token:
   name:
+excel:
+  path:

@@ -14,6 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 @Table(name = "day")
+//TODO: add notes field
 public class Day {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

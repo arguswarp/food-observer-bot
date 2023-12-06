@@ -41,10 +41,8 @@ public class UserStateProcessor {
         this.menuService = menuService;
     }
 
-    public SendMessage process(Message message, BotUser botUser) {
+    public SendMessage process(BotUser botUser, Long chatId, String text) {
         var userState = botUser.getUserState();
-        var text = message.getText();
-        var chatId = message.getChatId();
         switch (userState) {
             case INPUT_FOOD -> {
                 var foodRecord = FoodRecord.builder()

@@ -17,6 +17,8 @@ public class CallbackQueryHandler implements UpdateHandler<CallbackQuery> {
 
     @Override
     public PartialBotApiMethod<?> handleUpdate(CallbackQuery callbackQuery, BotUser botUser) {
-        return commandProcessor.process(callbackQuery, botUser);
+        var chatId = callbackQuery.getMessage().getChatId();
+        var text = callbackQuery.getData();
+        return commandProcessor.process(botUser, chatId, text);
     }
 }

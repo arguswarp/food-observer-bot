@@ -24,10 +24,11 @@ public class MessageHandler implements UpdateHandler<Message> {
 
     @Override
     public PartialBotApiMethod<?> handleUpdate(Message message, BotUser botUser) {
-        String text = message.getText();
+        var text = message.getText();
+        var chatId = message.getChatId();
         if (ServiceCommands.isCommand(text) && (text.equals(CANCEL.getCommand()) || botUser.getUserState().equals(BASIC_STATE))) {
-            return commandProcessor.process(message, botUser);
+            return commandProcessor.process(botUser, chatId, text);
         }
-        return stateProcessor.process(message, botUser);
+        return stateProcessor.process(botUser, chatId, text);
     }
 }
