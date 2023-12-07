@@ -9,3 +9,5 @@ databaseChangeLog:
       file: db/changelog/changeset/alter-table-food_record.food.length.sql
   - include:
       file: db/changelog/changeset/alter-table-day.pimple.ratings.sql
+  - include:
+      file: db/changelog/changeset/alter-table-bot_user.add_mode.sql

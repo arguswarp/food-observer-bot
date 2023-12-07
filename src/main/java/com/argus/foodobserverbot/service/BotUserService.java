@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 
+import java.time.LocalDate;
 import java.util.Optional;
 
 import static com.argus.foodobserverbot.entity.enums.UserState.BASIC_STATE;
@@ -43,5 +44,9 @@ public class BotUserService {
             return botUserRepository.save(transientAppUser);
         }
         return persistentBotUser;
+    }
+    @Transactional(readOnly = true)
+    public LocalDate selectDay(BotUser botUser) {
+        return botUser.getTodayMode() ? LocalDate.now() : LocalDate.now().minusDays(1);
     }
 }

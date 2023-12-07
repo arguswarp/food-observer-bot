@@ -7,20 +7,19 @@ import com.argus.foodobserverbot.exception.DatabaseException;
 import com.argus.foodobserverbot.repository.BotUserRepository;
 import com.argus.foodobserverbot.repository.DayRepository;
 import com.argus.foodobserverbot.repository.FoodRecordRepository;
+import com.argus.foodobserverbot.service.BotUserService;
 import com.argus.foodobserverbot.service.MenuService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.objects.Message;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.function.Consumer;
 
 import static com.argus.foodobserverbot.entity.enums.UserState.BASIC_STATE;
-import static com.argus.foodobserverbot.telegram.enums.ServiceCommands.CANCEL;
+import static com.argus.foodobserverbot.telegram.enums.ServiceCommands.*;
 
 @Component
 @Log4j2
@@ -30,13 +29,16 @@ public class UserStateProcessor {
 
     private final BotUserRepository botUserRepository;
 
+    private final BotUserService botUserService;
+
     private final FoodRecordRepository foodRecordRepository;
 
     private final MenuService menuService;
 
-    public UserStateProcessor(DayRepository dayRepository, BotUserRepository botUserRepository, FoodRecordRepository foodRecordRepository, MenuService menuService) {
+    public UserStateProcessor(DayRepository dayRepository, BotUserRepository botUserRepository, BotUserService botUserService, FoodRecordRepository foodRecordRepository, MenuService menuService) {
         this.dayRepository = dayRepository;
         this.botUserRepository = botUserRepository;
+        this.botUserService = botUserService;
         this.foodRecordRepository = foodRecordRepository;
         this.menuService = menuService;
     }
@@ -48,8 +50,8 @@ public class UserStateProcessor {
                 var foodRecord = FoodRecord.builder()
                         .food(text)
                         .createdAt(LocalDateTime.now())
-                        .creationDay(dayRepository.findByDate(LocalDate.now())
-                                .orElseThrow(() -> new DatabaseException("Can't find today")))
+                        .creationDay(dayRepository.findByDate(botUserService.selectDay(botUser))
+                                .orElseThrow(() -> new DatabaseException("Can't find the day")))
                         .build();
                 foodRecordRepository.save(foodRecord);
                 botUser.setUserState(BASIC_STATE);
@@ -60,12 +62,16 @@ public class UserStateProcessor {
                 return SendMessage.builder()
                         .chatId(chatId)
                         .text("You added food record")
+                        .replyMarkup(menuService.createOneRowReplyKeyboard(
+                                List.of("Another food", "Another record", "Cancel"),
+                                List.of(FOOD_RECORD.getCommand(), RECORD.getCommand(), CANCEL.getCommand())
+                        ))
                         .build();
             }
             case INPUT_BLOOD_RATE -> {
                 return SendMessage.builder()
                         .chatId(chatId)
-                        .text(setDayRatingToday(botUser,
+                        .text(setDayRating(botUser,
                                 day -> day.setBloodyRating(Integer.parseInt(text)),
                                 "Bloody rating is updated"))
                         .build();
@@ -73,7 +79,7 @@ public class UserStateProcessor {
             case INPUT_PIMPLE_RATE_FACE -> {
                 return SendMessage.builder()
                         .chatId(chatId)
-                        .text(setDayRatingToday(botUser,
+                        .text(setDayRating(botUser,
                                 day -> day.setPimpleFaceRating(Integer.parseInt(text)),
                                 "Pimple rating is updated"))
                         .build();
@@ -81,7 +87,7 @@ public class UserStateProcessor {
             case INPUT_PIMPLE_RATE_BOOTY -> {
                 return SendMessage.builder()
                         .chatId(chatId)
-                        .text(setDayRatingToday(botUser,
+                        .text(setDayRating(botUser,
                                 day -> day.setPimpleBootyRating(Integer.parseInt(text)),
                                 "Pimple rating is updated"))
                         .build();
@@ -100,8 +106,9 @@ public class UserStateProcessor {
         }
     }
 
-    private String setDayRatingToday(BotUser botUser, Consumer<Day> dayConsumer, String response) {
-        var dayOptional = dayRepository.findByDate(LocalDate.now());
+
+    private String setDayRating(BotUser botUser, Consumer<Day> dayConsumer, String response) {
+        var dayOptional = dayRepository.findByDate(botUserService.selectDay(botUser));
         var day = dayOptional.orElseThrow(() -> {
             log.error("Today is not present after day record was started");
             return new DatabaseException("Can't find today");

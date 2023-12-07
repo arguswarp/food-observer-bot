@@ -13,6 +13,8 @@ public enum ServiceCommands {
     FOOD_RECORD("/food", "Adds food record"),
     EXCEL_ALL_DATA("/excelall", "Saves all records to excel file"),
     DAY("/day", "Starts today record"),
+    DAY_TODAY("/today","Saves today records"),
+    DAY_YESTERDAY("/yesterday","Saves yesterday records"),
     IS_BLOOD("/blood", "Sets bloody rating"),
     IS_PIMPLE("/pimple", "Sets if there are pimples"),
     PIMPLE_FACE("/face", "Sets face pimples rating"),

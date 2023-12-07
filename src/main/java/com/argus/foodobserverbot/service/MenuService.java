@@ -26,4 +26,30 @@ public class MenuService {
                 .keyboard(List.of(buttons))
                 .build();
     }
+
+    public ReplyKeyboard createTwoRowReplyKeyboard(List<String> buttonsRowOne, List<String> callbackDataRowOne,
+                                                   List<String> buttonsRowTwo, List<String> callbackDataRowTwo) {
+        if (!(buttonsRowOne.size() == callbackDataRowOne.size()) ||
+                !(buttonsRowTwo.size() == callbackDataRowTwo.size())) {
+            throw new IllegalArgumentException("Button names and callback datas must match");
+        }
+        List<InlineKeyboardButton> rowOne = new ArrayList<>();
+        for (int i = 0; i < buttonsRowOne.size(); i++) {
+            rowOne.add(InlineKeyboardButton.builder()
+                    .text(buttonsRowOne.get(i))
+                    .callbackData(callbackDataRowOne.get(i))
+                    .build());
+        }
+        List<InlineKeyboardButton> rowTwo = new ArrayList<>();
+        for (int i = 0; i < buttonsRowTwo.size(); i++) {
+            rowTwo.add(InlineKeyboardButton.builder()
+                    .text(buttonsRowTwo.get(i))
+                    .callbackData(callbackDataRowTwo.get(i))
+                    .build());
+        }
+        return InlineKeyboardMarkup.builder()
+                .keyboardRow(rowOne)
+                .keyboardRow(rowTwo)
+                .build();
+    }
 }

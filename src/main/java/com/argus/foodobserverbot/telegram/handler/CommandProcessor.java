@@ -6,6 +6,7 @@ import com.argus.foodobserverbot.entity.enums.UserState;
 import com.argus.foodobserverbot.exception.UnknownServiceCommandException;
 import com.argus.foodobserverbot.repository.BotUserRepository;
 import com.argus.foodobserverbot.repository.DayRepository;
+import com.argus.foodobserverbot.service.BotUserService;
 import com.argus.foodobserverbot.service.ExcelService;
 import com.argus.foodobserverbot.service.MenuService;
 import com.argus.foodobserverbot.telegram.enums.ServiceCommands;
@@ -28,18 +29,21 @@ import static com.argus.foodobserverbot.telegram.enums.ServiceCommands.*;
 @Log4j2
 public class CommandProcessor {
     private final BotUserRepository botUserRepository;
+    private final BotUserService botUserService;
     private final DayRepository dayRepository;
     private final MenuService menuService;
     private final ExcelService excelService;
     @Value("${excel.path}")
     private String EXCEL_PATH;
 
-    public CommandProcessor(BotUserRepository botUserRepository, DayRepository dayRepository, MenuService menuService, ExcelService excelService) {
+    public CommandProcessor(BotUserRepository botUserRepository, BotUserService botUserService, DayRepository dayRepository, MenuService menuService, ExcelService excelService) {
         this.botUserRepository = botUserRepository;
+        this.botUserService = botUserService;
         this.dayRepository = dayRepository;
         this.menuService = menuService;
         this.excelService = excelService;
     }
+
     //TODO: add previous day records
     public PartialBotApiMethod<?> process(BotUser botUser, Long chatId, String text) {
         try {
@@ -65,9 +69,43 @@ public class CommandProcessor {
                     return SendMessage.builder()
                             .chatId(chatId)
                             .text("Choose the record type to add")
+                            .replyMarkup(menuService.createTwoRowReplyKeyboard(
+                                    List.of("Food", "Pimples", "Cancel"),
+                                    List.of(FOOD_RECORD.getCommand(), IS_PIMPLE.getCommand(), CANCEL.getCommand()),
+                                    List.of("Change mode", "Excel report"),
+                                    List.of(MODE.getCommand(), EXCEL_ALL_DATA.getCommand())
+                            ))
+                            .build();
+                }
+                case MODE -> {
+                    return SendMessage.builder()
+                            .chatId(chatId)
+                            .text("Choose the day for record")
                             .replyMarkup(menuService.createOneRowReplyKeyboard(
-                                    List.of("Add food record", "Add pimples", "Change mode", "Get excel all data", "Cancel"),
-                                    List.of(FOOD_RECORD.getCommand(), IS_PIMPLE.getCommand(), MODE.getCommand(), EXCEL_ALL_DATA.getCommand(), CANCEL.getCommand())))
+                                    List.of("Today", "Yesterday"),
+                                    List.of(DAY_TODAY.getCommand(), DAY_YESTERDAY.getCommand())))
+                            .build();
+                }
+                case DAY_TODAY -> {
+                    botUser.setTodayMode(true);
+                    botUserRepository.save(botUser);
+                    return SendMessage.builder()
+                            .chatId(chatId)
+                            .text("You now saving today records")
+                            .replyMarkup(menuService.createOneRowReplyKeyboard(
+                                    List.of("Add record", "Change mode"),
+                                    List.of(RECORD.getCommand(), MODE.getCommand())))
+                            .build();
+                }
+                case DAY_YESTERDAY -> {
+                    botUser.setTodayMode(false);
+                    botUserRepository.save(botUser);
+                    return SendMessage.builder()
+                            .chatId(chatId)
+                            .text("You now saving yesterday records")
+                            .replyMarkup(menuService.createOneRowReplyKeyboard(
+                                    List.of("Add record", "Change mode"),
+                                    List.of(RECORD.getCommand(), MODE.getCommand())))
                             .build();
                 }
                 case DAY -> {
@@ -84,10 +122,13 @@ public class CommandProcessor {
                             .build();
                 }
                 case FOOD_RECORD -> {
-                    if (!dayRepository.existsDayByDateIs(LocalDate.now())) {
+                    if (!dayRepository.existsDayByDateIs(botUserService.selectDay(botUser))) {
                         var day = Day.builder()
-                                .date(LocalDate.now())
+                                .date(botUserService.selectDay(botUser))
                                 .creator(botUser)
+                                .bloodyRating(0)
+                                .pimpleFaceRating(0)
+                                .pimpleBootyRating(0)
                                 .build();
                         dayRepository.save(day);
                     }
@@ -98,10 +139,10 @@ public class CommandProcessor {
                             + " new state is: " + botUser.getUserState());
                     return SendMessage.builder()
                             .chatId(chatId)
-                            .text("Enter food")
+                            .text("Enter food for " + (botUser.getTodayMode() ? "today" : "yesterday"))
                             .replyMarkup(menuService.createOneRowReplyKeyboard(
-                                    List.of("Cancel"),
-                                    List.of(CANCEL.getCommand())))
+                                    List.of("Change mode", "Cancel"),
+                                    List.of(MODE.getCommand(), CANCEL.getCommand())))
                             .build();
                 }
                 case EXCEL_ALL_DATA -> {
@@ -127,13 +168,11 @@ public class CommandProcessor {
                             .chatId(chatId)
                             .text(askAndChangeState(botUser,
                                     BASIC_STATE,
-                                    "Choose where the pimples are: "
-                                            + PIMPLE_FACE.getCommand()
-                                            + " or "
-                                            + PIMPLE_BOOTY.getCommand()))
+                                    "Choose where the pimples "
+                                            + (botUser.getTodayMode()? "are today" : "were yesterday")))
                             .replyMarkup(menuService.createOneRowReplyKeyboard(
-                                    List.of("Face", "Booty"),
-                                    List.of(PIMPLE_FACE.getCommand(), PIMPLE_BOOTY.getCommand())))
+                                    List.of("Face", "Booty", "Cancel"),
+                                    List.of(PIMPLE_FACE.getCommand(), PIMPLE_BOOTY.getCommand(), CANCEL.getCommand())))
                             .build();
                 }
                 case PIMPLE_FACE -> {
