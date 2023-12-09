@@ -7,6 +7,7 @@ import com.argus.foodobserverbot.repository.BotUserRepository;
 import com.argus.foodobserverbot.repository.DayRepository;
 import com.argus.foodobserverbot.repository.FoodRecordRepository;
 import com.argus.foodobserverbot.service.MenuService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

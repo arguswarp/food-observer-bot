@@ -62,9 +62,7 @@ public class CommandProcessor {
                             .chatId(chatId)
                             .text("Hello there, " + botUser.getName() + "!"
                                     + " Enter /help to see available commands")
-                            .replyMarkup(menuService.createOneRowReplyKeyboard(
-                                    List.of("Add record", "Help"),
-                                    List.of(RECORD.getCommand(), HELP.getCommand())))
+                            .replyMarkup(menuService.createMainMenu())
                             .build();
                 }
                 case RECORD -> {
@@ -72,7 +70,7 @@ public class CommandProcessor {
                             .chatId(chatId)
                             .text("Choose the record type to add")
                             .replyMarkup(menuService.createTwoRowReplyKeyboard(
-                                    List.of("Food", "Pimples", "Cancel"),
+                                    List.of(FOOD_RECORD.getButtonName(), IS_PIMPLE.getButtonName(), CANCEL.getButtonName()),
                                     List.of(FOOD_RECORD.getCommand(), IS_PIMPLE.getCommand(), CANCEL.getCommand()),
                                     List.of("Change mode", "Excel report"),
                                     List.of(MODE.getCommand(), EXCEL_ALL_DATA.getCommand())
@@ -84,7 +82,7 @@ public class CommandProcessor {
                             .chatId(chatId)
                             .text("Choose the day for record")
                             .replyMarkup(menuService.createOneRowReplyKeyboard(
-                                    List.of("Today", "Yesterday"),
+                                    List.of(DAY_TODAY.getButtonName(), DAY_YESTERDAY.getButtonName()),
                                     List.of(DAY_TODAY.getCommand(), DAY_YESTERDAY.getCommand())))
                             .build();
                 }
@@ -95,7 +93,7 @@ public class CommandProcessor {
                             .chatId(chatId)
                             .text("You now saving today records")
                             .replyMarkup(menuService.createOneRowReplyKeyboard(
-                                    List.of("Add record", "Change mode"),
+                                    List.of(RECORD.getButtonName(), MODE.getButtonName()),
                                     List.of(RECORD.getCommand(), MODE.getCommand())))
                             .build();
                 }
@@ -106,7 +104,7 @@ public class CommandProcessor {
                             .chatId(chatId)
                             .text("You now saving yesterday records")
                             .replyMarkup(menuService.createOneRowReplyKeyboard(
-                                    List.of("Add record", "Change mode"),
+                                    List.of(RECORD.getButtonName(), MODE.getButtonName()),
                                     List.of(RECORD.getCommand(), MODE.getCommand())))
                             .build();
                 }
@@ -134,7 +132,7 @@ public class CommandProcessor {
                             .chatId(chatId)
                             .text("Enter food for " + (botUser.getTodayMode() ? "today" : "yesterday"))
                             .replyMarkup(menuService.createOneRowReplyKeyboard(
-                                    List.of("Change mode", "Cancel"),
+                                    List.of(MODE.getButtonName(),  CANCEL.getButtonName()),
                                     List.of(MODE.getCommand(), CANCEL.getCommand())))
                             .build();
                 }
@@ -152,7 +150,7 @@ public class CommandProcessor {
                                     INPUT_BLOOD_RATE,
                                     "How bloody is the poop? From 0 to 10"))
                             .replyMarkup(menuService.createOneRowReplyKeyboard(
-                                    List.of("Cancel"),
+                                    List.of(CANCEL.getButtonName()),
                                     List.of(CANCEL.getCommand())))
                             .build();
                 }
@@ -164,7 +162,7 @@ public class CommandProcessor {
                                     "Choose where the pimples "
                                             + (botUser.getTodayMode() ? "are today" : "were yesterday")))
                             .replyMarkup(menuService.createOneRowReplyKeyboard(
-                                    List.of("Face", "Booty", "Cancel"),
+                                    List.of(PIMPLE_FACE.getButtonName(), PIMPLE_BOOTY.getButtonName(), CANCEL.getButtonName()),
                                     List.of(PIMPLE_FACE.getCommand(), PIMPLE_BOOTY.getCommand(), CANCEL.getCommand())))
                             .build();
                 }
@@ -175,7 +173,7 @@ public class CommandProcessor {
                                     INPUT_PIMPLE_RATE_FACE,
                                     "How much pimples? From 0 to 10"))
                             .replyMarkup(menuService.createOneRowReplyKeyboard(
-                                    List.of("Cancel"),
+                                    List.of(CANCEL.getButtonName()),
                                     List.of(CANCEL.getCommand())))
                             .build();
                 }
@@ -186,7 +184,7 @@ public class CommandProcessor {
                                     INPUT_PIMPLE_RATE_BOOTY,
                                     "How much pimples? From 0 to 10"))
                             .replyMarkup(menuService.createOneRowReplyKeyboard(
-                                    List.of("Cancel"),
+                                    List.of(CANCEL.getButtonName()),
                                     List.of(CANCEL.getCommand())))
                             .build();
                 }

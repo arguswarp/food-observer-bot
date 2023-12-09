@@ -1,6 +1,7 @@
 package com.argus.foodobserverbot.telegram;
 
 import com.argus.foodobserverbot.controller.UpdateController;
+import com.argus.foodobserverbot.service.MenuService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -20,8 +21,11 @@ public class TelegramBot extends TelegramLongPollingBot {
     private String name;
     private final UpdateController updateController;
 
-    public TelegramBot(UpdateController updateController) {
+    private final MenuService menuService;
+
+    public TelegramBot(UpdateController updateController, MenuService menuService) {
         this.updateController = updateController;
+        this.menuService = menuService;
     }
 
     @Override
@@ -40,13 +44,12 @@ public class TelegramBot extends TelegramLongPollingBot {
     }
 
     public void sendAnswerMessage(PartialBotApiMethod<?> message) {
-
         if (message != null) {
             try {
-                if (message instanceof SendMessage) {
-                    execute((SendMessage)message);
-                } else if (message instanceof SendDocument) {
-                    execute((SendDocument) message);
+                if (message instanceof SendMessage sendMessage) {
+                    execute(sendMessage);
+                } else if (message instanceof SendDocument sendDocument) {
+                    execute(sendDocument);
                 }
             } catch (TelegramApiException e) {
                 log.error(e);
