@@ -7,6 +7,7 @@ import com.argus.foodobserverbot.exception.UnknownServiceCommandException;
 import com.argus.foodobserverbot.repository.BotUserRepository;
 import com.argus.foodobserverbot.repository.DayRepository;
 import com.argus.foodobserverbot.service.BotUserService;
+import com.argus.foodobserverbot.service.DayService;
 import com.argus.foodobserverbot.service.ExcelService;
 import com.argus.foodobserverbot.service.MenuService;
 import com.argus.foodobserverbot.telegram.enums.ServiceCommands;
@@ -31,20 +32,21 @@ public class CommandProcessor {
     private final BotUserRepository botUserRepository;
     private final BotUserService botUserService;
     private final DayRepository dayRepository;
+    private final DayService dayService;
     private final MenuService menuService;
     private final ExcelService excelService;
     @Value("${excel.path}")
     private String EXCEL_PATH;
 
-    public CommandProcessor(BotUserRepository botUserRepository, BotUserService botUserService, DayRepository dayRepository, MenuService menuService, ExcelService excelService) {
+    public CommandProcessor(BotUserRepository botUserRepository, BotUserService botUserService, DayRepository dayRepository, DayService dayService, MenuService menuService, ExcelService excelService) {
         this.botUserRepository = botUserRepository;
         this.botUserService = botUserService;
         this.dayRepository = dayRepository;
+        this.dayService = dayService;
         this.menuService = menuService;
         this.excelService = excelService;
     }
 
-    //TODO: add previous day records
     public PartialBotApiMethod<?> process(BotUser botUser, Long chatId, String text) {
         try {
             var serviceCommand = ServiceCommands.getServiceCommandByValue(text);
@@ -122,16 +124,7 @@ public class CommandProcessor {
                             .build();
                 }
                 case FOOD_RECORD -> {
-                    if (!dayRepository.existsDayByDateIs(botUserService.selectDay(botUser))) {
-                        var day = Day.builder()
-                                .date(botUserService.selectDay(botUser))
-                                .creator(botUser)
-                                .bloodyRating(0)
-                                .pimpleFaceRating(0)
-                                .pimpleBootyRating(0)
-                                .build();
-                        dayRepository.save(day);
-                    }
+                    dayService.findOrSaveDay(botUser, botUserService.selectDay(botUser));
                     botUser.setUserState(INPUT_FOOD);
                     botUserRepository.save(botUser);
                     log.info("User " + botUser.getName()
@@ -169,7 +162,7 @@ public class CommandProcessor {
                             .text(askAndChangeState(botUser,
                                     BASIC_STATE,
                                     "Choose where the pimples "
-                                            + (botUser.getTodayMode()? "are today" : "were yesterday")))
+                                            + (botUser.getTodayMode() ? "are today" : "were yesterday")))
                             .replyMarkup(menuService.createOneRowReplyKeyboard(
                                     List.of("Face", "Booty", "Cancel"),
                                     List.of(PIMPLE_FACE.getCommand(), PIMPLE_BOOTY.getCommand(), CANCEL.getCommand())))
@@ -217,13 +210,7 @@ public class CommandProcessor {
     }
 
     private String askAndChangeState(BotUser botUser, UserState state, String message) {
-        if (!dayRepository.existsDayByDateIs(LocalDate.now())) {
-            var day = Day.builder()
-                    .date(LocalDate.now())
-                    .creator(botUser)
-                    .build();
-            dayRepository.save(day);
-        }
+        dayService.findOrSaveDay(botUser, botUserService.selectDay(botUser));
         botUser.setUserState(state);
         botUserRepository.save(botUser);
         return message;
