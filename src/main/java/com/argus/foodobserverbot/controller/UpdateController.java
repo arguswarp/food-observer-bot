@@ -20,7 +20,6 @@ public class UpdateController {
     private final UpdateHandler<Message> messageHandler;
     private final BotUserService botUserService;
 
-
     public UpdateController(UpdateHandler<CallbackQuery> callbackQueryHandler, UpdateHandler<Message> messageHandler, BotUserService botUserService) {
         this.callbackQueryHandler = callbackQueryHandler;
         this.messageHandler = messageHandler;
