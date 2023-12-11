@@ -1,11 +1,8 @@
 package com.argus.foodobserverbot.telegram.handler;
 
 import com.argus.foodobserverbot.entity.BotUser;
-import com.argus.foodobserverbot.entity.Day;
 import com.argus.foodobserverbot.entity.enums.UserState;
 import com.argus.foodobserverbot.exception.UnknownServiceCommandException;
-import com.argus.foodobserverbot.repository.BotUserRepository;
-import com.argus.foodobserverbot.repository.DayRepository;
 import com.argus.foodobserverbot.service.BotUserService;
 import com.argus.foodobserverbot.service.DayService;
 import com.argus.foodobserverbot.service.ExcelService;
@@ -19,7 +16,6 @@ import org.telegram.telegrambots.meta.api.methods.send.SendDocument;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 
@@ -29,19 +25,15 @@ import static com.argus.foodobserverbot.telegram.enums.ServiceCommands.*;
 @Component
 @Log4j2
 public class CommandProcessor {
-    private final BotUserRepository botUserRepository;
     private final BotUserService botUserService;
-    private final DayRepository dayRepository;
     private final DayService dayService;
     private final MenuService menuService;
     private final ExcelService excelService;
     @Value("${excel.path}")
     private String EXCEL_PATH;
 
-    public CommandProcessor(BotUserRepository botUserRepository, BotUserService botUserService, DayRepository dayRepository, DayService dayService, MenuService menuService, ExcelService excelService) {
-        this.botUserRepository = botUserRepository;
+    public CommandProcessor(BotUserService botUserService, DayService dayService, MenuService menuService, ExcelService excelService) {
         this.botUserService = botUserService;
-        this.dayRepository = dayRepository;
         this.dayService = dayService;
         this.menuService = menuService;
         this.excelService = excelService;
@@ -87,8 +79,9 @@ public class CommandProcessor {
                             .build();
                 }
                 case DAY_TODAY -> {
-                    botUser.setTodayMode(true);
-                    botUserRepository.save(botUser);
+                    var user = botUserService.changeTodayMode(botUser, true);
+                    log.info("User " + user.getName()
+                            + " change mode to " + DAY_TODAY.getCommand());
                     return SendMessage.builder()
                             .chatId(chatId)
                             .text("You now saving today records")
@@ -98,8 +91,9 @@ public class CommandProcessor {
                             .build();
                 }
                 case DAY_YESTERDAY -> {
-                    botUser.setTodayMode(false);
-                    botUserRepository.save(botUser);
+                    var user = botUserService.changeTodayMode(botUser, false);
+                    log.info("User " + user.getName()
+                            + " change mode to " + DAY_YESTERDAY.getCommand());
                     return SendMessage.builder()
                             .chatId(chatId)
                             .text("You now saving yesterday records")
@@ -108,31 +102,13 @@ public class CommandProcessor {
                                     List.of(RECORD.getCommand(), MODE.getCommand())))
                             .build();
                 }
-                case DAY -> {
-                    if (!dayRepository.existsDayByDateIs(LocalDate.now())) {
-                        var day = Day.builder()
-                                .date(LocalDate.now())
-                                .creator(botUser)
-                                .build();
-                        dayRepository.save(day);
-                    }
-                    return SendMessage.builder()
-                            .chatId(chatId)
-                            .text("You have started this day's record")
-                            .build();
-                }
                 case FOOD_RECORD -> {
-                    dayService.findOrSaveDay(botUser, botUserService.selectDay(botUser));
-                    botUser.setUserState(INPUT_FOOD);
-                    botUserRepository.save(botUser);
-                    log.info("User " + botUser.getName()
-                            + " called: " + FOOD_RECORD.getCommand()
-                            + " new state is: " + botUser.getUserState());
+                    newRecord(botUser, INPUT_FOOD, FOOD_RECORD);
                     return SendMessage.builder()
                             .chatId(chatId)
                             .text("Enter food for " + (botUser.getTodayMode() ? "today" : "yesterday"))
                             .replyMarkup(menuService.createOneRowReplyKeyboard(
-                                    List.of(MODE.getButtonName(),  CANCEL.getButtonName()),
+                                    List.of(MODE.getButtonName(), CANCEL.getButtonName()),
                                     List.of(MODE.getCommand(), CANCEL.getCommand())))
                             .build();
                 }
@@ -144,45 +120,41 @@ public class CommandProcessor {
                             .build();
                 }
                 case IS_BLOOD -> {
+                    newRecord(botUser, INPUT_BLOOD_RATE, IS_BLOOD);
                     return SendMessage.builder()
                             .chatId(chatId)
-                            .text(askAndChangeState(botUser,
-                                    INPUT_BLOOD_RATE,
-                                    "How bloody is the poop? From 0 to 10"))
+                            .text("How bloody is the poop? From 0 to 10")
                             .replyMarkup(menuService.createOneRowReplyKeyboard(
                                     List.of(CANCEL.getButtonName()),
                                     List.of(CANCEL.getCommand())))
                             .build();
                 }
                 case IS_PIMPLE -> {
+                    newRecord(botUser, BASIC_STATE, IS_PIMPLE);
                     return SendMessage.builder()
                             .chatId(chatId)
-                            .text(askAndChangeState(botUser,
-                                    BASIC_STATE,
-                                    "Choose where the pimples "
-                                            + (botUser.getTodayMode() ? "are today" : "were yesterday")))
+                            .text("Choose where the pimples "
+                                    + (botUser.getTodayMode() ? "are today" : "were yesterday"))
                             .replyMarkup(menuService.createOneRowReplyKeyboard(
                                     List.of(PIMPLE_FACE.getButtonName(), PIMPLE_BOOTY.getButtonName(), CANCEL.getButtonName()),
                                     List.of(PIMPLE_FACE.getCommand(), PIMPLE_BOOTY.getCommand(), CANCEL.getCommand())))
                             .build();
                 }
                 case PIMPLE_FACE -> {
+                    newRecord(botUser, INPUT_PIMPLE_RATE_FACE, PIMPLE_FACE);
                     return SendMessage.builder()
                             .chatId(chatId)
-                            .text(askAndChangeState(botUser,
-                                    INPUT_PIMPLE_RATE_FACE,
-                                    "How much pimples? From 0 to 10"))
+                            .text("How much pimples? From 0 to 10")
                             .replyMarkup(menuService.createOneRowReplyKeyboard(
                                     List.of(CANCEL.getButtonName()),
                                     List.of(CANCEL.getCommand())))
                             .build();
                 }
                 case PIMPLE_BOOTY -> {
+                    newRecord(botUser, INPUT_PIMPLE_RATE_BOOTY, PIMPLE_BOOTY);
                     return SendMessage.builder()
                             .chatId(chatId)
-                            .text(askAndChangeState(botUser,
-                                    INPUT_PIMPLE_RATE_BOOTY,
-                                    "How much pimples? From 0 to 10"))
+                            .text("How much pimples? From 0 to 10")
                             .replyMarkup(menuService.createOneRowReplyKeyboard(
                                     List.of(CANCEL.getButtonName()),
                                     List.of(CANCEL.getCommand())))
@@ -207,11 +179,12 @@ public class CommandProcessor {
         }
     }
 
-    private String askAndChangeState(BotUser botUser, UserState state, String message) {
-        dayService.findOrSaveDay(botUser, botUserService.selectDay(botUser));
-        botUser.setUserState(state);
-        botUserRepository.save(botUser);
-        return message;
+    private void newRecord(BotUser botUser, UserState state, ServiceCommands command) {
+        var day = dayService.findOrSaveDay(botUser, botUserService.selectDate(botUser));
+        var user = botUserService.changeState(botUser, state);
+        log.info("User " + user.getName()
+                + " started " + command.getCommand()
+                + " on day " + day.getDate());
     }
 
     //TODO: add new commands
@@ -234,8 +207,7 @@ public class CommandProcessor {
     }
 
     private String cancel(BotUser botUser) {
-        botUser.setUserState(BASIC_STATE);
-        botUserRepository.save(botUser);
+        botUserService.changeState(botUser, BASIC_STATE);
         log.info("User " + botUser.getName()
                 + " called: " + CANCEL.getCommand()
                 + " state is: " + botUser.getUserState());

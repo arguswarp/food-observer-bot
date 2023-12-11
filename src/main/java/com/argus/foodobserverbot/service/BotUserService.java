@@ -1,6 +1,7 @@
 package com.argus.foodobserverbot.service;
 
 import com.argus.foodobserverbot.entity.BotUser;
+import com.argus.foodobserverbot.entity.enums.UserState;
 import com.argus.foodobserverbot.exception.EmptyUpdateException;
 import com.argus.foodobserverbot.repository.BotUserRepository;
 import lombok.extern.log4j.Log4j2;
@@ -16,13 +17,14 @@ import static com.argus.foodobserverbot.entity.enums.UserState.BASIC_STATE;
 
 @Service
 @Log4j2
+@Transactional
 public class BotUserService {
     private final BotUserRepository botUserRepository;
+
     public BotUserService(BotUserRepository botUserRepository) {
         this.botUserRepository = botUserRepository;
     }
 
-    @Transactional
     public BotUser findOrSaveAppUser(Update update) {
         Optional<User> telegramUser = Optional.empty();
         if (update.hasMessage()) {
@@ -45,8 +47,19 @@ public class BotUserService {
         }
         return persistentBotUser;
     }
+
+    public BotUser changeState(BotUser botUser, UserState state) {
+        botUser.setUserState(state);
+        return botUserRepository.save(botUser);
+    }
+
+    public BotUser changeTodayMode(BotUser botUser, boolean mode) {
+        botUser.setTodayMode(mode);
+        return botUserRepository.save(botUser);
+    }
+
     @Transactional(readOnly = true)
-    public LocalDate selectDay(BotUser botUser) {
+    public LocalDate selectDate(BotUser botUser) {
         return botUser.getTodayMode() ? LocalDate.now() : LocalDate.now().minusDays(1);
     }
 }

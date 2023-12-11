@@ -1,6 +1,5 @@
 package com.argus.foodobserverbot.controller;
 
-
 import com.argus.foodobserverbot.exception.EmptyUpdateException;
 import com.argus.foodobserverbot.service.BotUserService;
 import com.argus.foodobserverbot.telegram.handler.UpdateHandler;
@@ -11,7 +10,6 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
-
 
 @Component
 @Log4j2
