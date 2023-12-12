@@ -12,7 +12,6 @@ public enum ServiceCommands {
     CANCEL("/cancel", "Aborts selected command", "Cancel command"),
     FOOD_RECORD("/food", "Adds food record", "Food"),
     EXCEL_ALL_DATA("/excelall", "Saves all records to excel file", "Excel report"),
-    DAY("/day", "Starts today record", "New day"),
     DAY_TODAY("/today","Saves today records", "Today"),
     DAY_YESTERDAY("/yesterday","Saves yesterday records", "Yesterday"),
     IS_BLOOD("/blood", "Sets bloody rating", "Blood"),
@@ -20,7 +19,6 @@ public enum ServiceCommands {
     PIMPLE_FACE("/face", "Sets face pimples rating", "Face"),
     PIMPLE_BOOTY("/booty", "Sets booty pimples rating", "Booty");
     private final String command;
-
     private final String description;
     private final String buttonName;
 

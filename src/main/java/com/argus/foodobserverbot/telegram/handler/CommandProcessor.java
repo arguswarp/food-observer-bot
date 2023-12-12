@@ -81,7 +81,7 @@ public class CommandProcessor {
                 case DAY_TODAY -> {
                     var user = botUserService.changeTodayMode(botUser, true);
                     log.info("User " + user.getName()
-                            + " change mode to " + DAY_TODAY.getCommand());
+                            + " changed mode to " + DAY_TODAY.getCommand());
                     return SendMessage.builder()
                             .chatId(chatId)
                             .text("You now saving today records")
@@ -93,7 +93,7 @@ public class CommandProcessor {
                 case DAY_YESTERDAY -> {
                     var user = botUserService.changeTodayMode(botUser, false);
                     log.info("User " + user.getName()
-                            + " change mode to " + DAY_YESTERDAY.getCommand());
+                            + " changed mode to " + DAY_YESTERDAY.getCommand());
                     return SendMessage.builder()
                             .chatId(chatId)
                             .text("You now saving yesterday records")
@@ -187,18 +187,19 @@ public class CommandProcessor {
                 + " on day " + day.getDate());
     }
 
-    //TODO: add new commands
     private String help(BotUser botUser) {
         log.info("User " + botUser.getName()
                 + " called: " + HELP.getCommand()
                 + " state is: " + botUser.getUserState());
         return """
                 List of available commands:\s
-                /cancel - cancel current command;
-                /day - start today's record;
+                /start - start the bot
+                /record - main menu to add records
                 /food - add food record;
-                /blood - changes the day to bloody;
-                /pimple - changes the day to pimple""";
+                /blood - set rating for blood in the poop;
+                /pimple - set rating for pimples
+                /mode - change record mode from today to yesterday
+                /excelall - save all records to excel file""";
     }
 
     private String unknown(String command) {
