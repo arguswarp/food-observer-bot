@@ -35,7 +35,7 @@ class ExcelServiceTest {
     void WhenCreateExcelFileAllData_FileIsCreated() {
         List<FoodRecord> foodRecords1 = List.of(
                 FoodRecord.builder()
-                        .food("pizza")
+                        .food("&ZXuH+GH1F &Vce%O!%0u p%=g#3VEKn Y$wqbgbPka gyazCVQW0e jJtCczc75q 2R@=dA9nmP 0JF5Q@s&6R =mYYzu5SJ!\n xV*&AV*J*x")
                         .build(),
                 FoodRecord.builder()
                         .food("burger")

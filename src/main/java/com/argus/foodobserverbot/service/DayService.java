@@ -30,7 +30,7 @@ public class DayService {
                     .pimpleFaceRating(0)
                     .pimpleBootyRating(0)
                     .build();
-            log.info("New day is saved " + day.toString());
+            log.info("User " + botUser.getName() + " started day record on" + day.getDate());
             return dayRepository.save(day);
         }
         return dayRepository.findByDate(date).orElseThrow(() -> new DatabaseException("Can't save or find day"));

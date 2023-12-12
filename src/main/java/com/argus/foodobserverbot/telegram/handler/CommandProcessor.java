@@ -183,7 +183,7 @@ public class CommandProcessor {
         var day = dayService.findOrSaveDay(botUser, botUserService.selectDate(botUser));
         var user = botUserService.changeState(botUser, state);
         log.info("User " + user.getName()
-                + " started " + command.getCommand()
+                + " called " + command.getCommand()
                 + " on day " + day.getDate());
     }
 

@@ -36,7 +36,7 @@ public class UserStateProcessor {
                 var food = foodRecordService.addFood(text, botUserService.selectDate(botUser));
                 var user = botUserService.changeState(botUser, BASIC_STATE);
                 log.info("User " + user.getName()
-                        + " new food input" + food.getFood());
+                        + " new food input " + food.getFood());
                 return SendMessage.builder()
                         .chatId(chatId)
                         .text("You added food record")
@@ -51,7 +51,7 @@ public class UserStateProcessor {
                         day -> day.setBloodyRating(Integer.parseInt(text)));
                 var user = botUserService.changeState(botUser, BASIC_STATE);
                 log.info("Bloody rating is updated by " + user.getName()
-                        + "new value is " + dayUpdated.getBloodyRating());
+                        + " new value is " + dayUpdated.getBloodyRating());
                 return SendMessage.builder()
                         .chatId(chatId)
                         .text("Bloody rating is updated")
@@ -62,7 +62,7 @@ public class UserStateProcessor {
                         day -> day.setPimpleFaceRating(Integer.parseInt(text)));
                 var user = botUserService.changeState(botUser, BASIC_STATE);
                 log.info("Pimple face rating is updated by " + user.getName()
-                        + "new value is " + dayUpdated.getPimpleFaceRating());
+                        + " new value is " + dayUpdated.getPimpleFaceRating());
                 return SendMessage.builder()
                         .chatId(chatId)
                         .text("Pimple face rating is updated")
@@ -73,7 +73,7 @@ public class UserStateProcessor {
                         day -> day.setPimpleBootyRating(Integer.parseInt(text)));
                 var user = botUserService.changeState(botUser, BASIC_STATE);
                 log.info("Pimple booty rating is updated by " + user.getName()
-                        + "new value is " + dayUpdated.getPimpleBootyRating());
+                        + " new value is " + dayUpdated.getPimpleBootyRating());
                 return SendMessage.builder()
                         .chatId(chatId)
                         .text("Pimple booty rating is updated")
