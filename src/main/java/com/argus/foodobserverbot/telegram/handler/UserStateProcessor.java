@@ -1,6 +1,7 @@
 package com.argus.foodobserverbot.telegram.handler;
 
 import com.argus.foodobserverbot.entity.BotUser;
+import com.argus.foodobserverbot.entity.Day;
 import com.argus.foodobserverbot.service.BotUserService;
 import com.argus.foodobserverbot.service.DayService;
 import com.argus.foodobserverbot.service.FoodRecordService;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 
 import java.util.List;
+import java.util.function.BiConsumer;
 
 import static com.argus.foodobserverbot.entity.enums.UserState.BASIC_STATE;
 import static com.argus.foodobserverbot.telegram.enums.ServiceCommands.*;
@@ -21,6 +23,7 @@ public class UserStateProcessor {
     private final BotUserService botUserService;
     private final FoodRecordService foodRecordService;
     private final MenuService menuService;
+    private static final String NUMBER_PATTERN = "^(10|[0-9])$";
 
     public UserStateProcessor(DayService dayService, BotUserService botUserService, FoodRecordService foodRecordService, MenuService menuService) {
         this.dayService = dayService;
@@ -47,37 +50,16 @@ public class UserStateProcessor {
                         .build();
             }
             case INPUT_BLOOD_RATE -> {
-                var dayUpdated = dayService.setDayRating(botUserService.selectDate(botUser),
-                        day -> day.setBloodyRating(Integer.parseInt(text)));
-                var user = botUserService.changeState(botUser, BASIC_STATE);
-                log.info("Bloody rating is updated by " + user.getName()
-                        + " new value is " + dayUpdated.getBloodyRating());
-                return SendMessage.builder()
-                        .chatId(chatId)
-                        .text("Bloody rating is updated")
-                        .build();
+                return processInputRating(botUser, text, chatId, (input, day) -> day.setBloodyRating(input),
+                        "Pimple blood rating is updated");
             }
             case INPUT_PIMPLE_RATE_FACE -> {
-                var dayUpdated = dayService.setDayRating(botUserService.selectDate(botUser),
-                        day -> day.setPimpleFaceRating(Integer.parseInt(text)));
-                var user = botUserService.changeState(botUser, BASIC_STATE);
-                log.info("Pimple face rating is updated by " + user.getName()
-                        + " new value is " + dayUpdated.getPimpleFaceRating());
-                return SendMessage.builder()
-                        .chatId(chatId)
-                        .text("Pimple face rating is updated")
-                        .build();
+                return processInputRating(botUser, text, chatId, (input, day) -> day.setPimpleFaceRating(input),
+                        "Pimple face rating is updated");
             }
             case INPUT_PIMPLE_RATE_BOOTY -> {
-                var dayUpdated = dayService.setDayRating(botUserService.selectDate(botUser),
-                        day -> day.setPimpleBootyRating(Integer.parseInt(text)));
-                var user = botUserService.changeState(botUser, BASIC_STATE);
-                log.info("Pimple booty rating is updated by " + user.getName()
-                        + " new value is " + dayUpdated.getPimpleBootyRating());
-                return SendMessage.builder()
-                        .chatId(chatId)
-                        .text("Pimple booty rating is updated")
-                        .build();
+                return processInputRating(botUser, text, chatId, (input, day) -> day.setPimpleBootyRating(input),
+                        "Pimple booty rating is updated");
             }
             default -> {
                 log.error("Unknown user state " + userState);
@@ -90,6 +72,34 @@ public class UserStateProcessor {
                         ))
                         .build();
             }
+        }
+    }
+
+    private boolean isValidNumber(String text) {
+        return text.matches(NUMBER_PATTERN);
+    }
+
+    private SendMessage processInputRating(BotUser botUser, String text, Long chatId,
+                                           BiConsumer<Integer, Day> consumer, String responseMessage) {
+        if (isValidNumber(text)) {
+            final var userState = botUser.getUserState();
+            int rating = Integer.parseInt(text);
+            var date = botUserService.selectDate(botUser);
+            dayService.setDayRating(rating, date, consumer);
+            var user = botUserService.changeState(botUser, BASIC_STATE);
+            log.info(userState + " day rating is updated by " + user.getName()
+                    + " new value is " + rating);
+            return SendMessage.builder()
+                    .chatId(chatId)
+                    .text(responseMessage)
+                    .build();
+        } else {
+            log.info("Invalid input on pimple booty rating by " + botUser.getName()
+                    + ": " + text);
+            return SendMessage.builder()
+                    .chatId(chatId)
+                    .text("Input is incorrect. Rating must be the number between 0 and 10. Please try again or /cancel")
+                    .build();
         }
     }
 }

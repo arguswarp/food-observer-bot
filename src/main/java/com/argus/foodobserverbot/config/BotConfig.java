@@ -26,7 +26,7 @@ public class BotConfig {
             addMainMenu(bot);
             return botsApi;
         } catch (TelegramApiException e) {
-            log.error("Error while bot bean initialization" + e.getMessage());
+            log.error("Error while bot initialization" + e.getMessage());
         }
         return null;
     }
