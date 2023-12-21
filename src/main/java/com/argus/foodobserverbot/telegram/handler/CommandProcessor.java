@@ -62,8 +62,8 @@ public class CommandProcessor {
                             .chatId(chatId)
                             .text("Choose the record type to add")
                             .replyMarkup(menuService.createTwoRowReplyKeyboard(
-                                    List.of(FOOD_RECORD.getButtonName(), IS_PIMPLE.getButtonName(), CANCEL.getButtonName()),
-                                    List.of(FOOD_RECORD.getCommand(), IS_PIMPLE.getCommand(), CANCEL.getCommand()),
+                                    List.of(FOOD_RECORD.getButtonName(), IS_BLOOD.getButtonName(), IS_PIMPLE.getButtonName(), CANCEL.getButtonName()),
+                                    List.of(FOOD_RECORD.getCommand(), IS_BLOOD.getCommand(), IS_PIMPLE.getCommand(), CANCEL.getCommand()),
                                     List.of("Change mode", "Excel report"),
                                     List.of(MODE.getCommand(), EXCEL_ALL_DATA.getCommand())
                             ))
