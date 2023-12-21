@@ -75,13 +75,9 @@ public class UserStateProcessor {
         }
     }
 
-    private boolean isValidNumber(String text) {
-        return text.matches(NUMBER_PATTERN);
-    }
-
     private SendMessage processInputRating(BotUser botUser, String text, Long chatId,
                                            BiConsumer<Integer, Day> consumer, String responseMessage) {
-        if (isValidNumber(text)) {
+        if (text.matches(NUMBER_PATTERN)) {
             final var userState = botUser.getUserState();
             int rating = Integer.parseInt(text);
             var date = botUserService.selectDate(botUser);
@@ -94,7 +90,7 @@ public class UserStateProcessor {
                     .text(responseMessage)
                     .build();
         } else {
-            log.info("Invalid input on pimple booty rating by " + botUser.getName()
+            log.error("Invalid input " + botUser.getUserState() + " by " + botUser.getName()
                     + ": " + text);
             return SendMessage.builder()
                     .chatId(chatId)
