@@ -1,17 +1,17 @@
 server:
-  port:
+  port: ${APP_PORT}
 spring:
   datasource:
-    url:
-    username:
-    password:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
   jpa:
-    generate-ddl:
-    show-sql:
+    generate-ddl: false
+    show-sql: false
   liquibase:
-    enabled:
+    enabled: true
 bot:
-  token:
-  name:
+  token: ${BOT_TOKEN}
+  name: ${BOT_NAME}
 excel:
-  path:
+  path: ${EXCEL_PATH}
