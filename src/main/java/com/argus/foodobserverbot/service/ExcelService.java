@@ -51,7 +51,7 @@ public class ExcelService {
                 CellStyle style = workbook.createCellStyle();
                 style.setWrapText(true);
 
-                List<Day> dayList = dayRepository.findAllByOrderByDateDesc();
+                List<Day> dayList = dayRepository.findByCreatorOrderByDateDesc(botUser);
                 int shift = 0;
 
                 Row header = sheet.createRow(0);

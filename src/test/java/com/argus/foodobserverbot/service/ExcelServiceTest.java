@@ -74,7 +74,7 @@ class ExcelServiceTest {
         BotUser user = BotUser.builder()
                 .name("Porfiriy")
                 .build();
-        Mockito.when(dayRepository.findAllByOrderByDateDesc()).thenReturn(dayRecords);
+        Mockito.when(dayRepository.findByCreatorOrderByDateDesc(Mockito.any())).thenReturn(dayRecords);
 
         excelService.createExcelFileAllData(FILE_PATH, user);
     }
