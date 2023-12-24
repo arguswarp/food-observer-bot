@@ -21,12 +21,15 @@ public class BotConfig {
     @Bean
     public TelegramBotsApi telegramBotsApi(TelegramBot bot) {
         try {
+            Thread.sleep(5000);
             TelegramBotsApi botsApi = new TelegramBotsApi(DefaultBotSession.class);
             botsApi.registerBot(bot);
             addMainMenu(bot);
             return botsApi;
         } catch (TelegramApiException e) {
             log.error("Error while bot initialization" + e.getMessage());
+        } catch (InterruptedException e) {
+            log.error("Thread is interrupted" + e.getMessage());
         }
         return null;
     }
