@@ -22,14 +22,11 @@ public class BotConfig {
     public TelegramBotsApi telegramBotsApi(TelegramBot bot) {
         try {
             TelegramBotsApi botsApi = new TelegramBotsApi(DefaultBotSession.class);
-            Thread.sleep(5000);
             botsApi.registerBot(bot);
             addMainMenu(bot);
             return botsApi;
         } catch (TelegramApiException e) {
             log.error("Error while bot initialization" + e.getMessage());
-        } catch (InterruptedException e) {
-            log.error("Thread is interrupted" + e.getMessage());
         }
         return null;
     }
