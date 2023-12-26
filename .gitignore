@@ -34,7 +34,7 @@ build/
 /src/main/resources/application.properties
 /src/main/resources/log4j.properties
 /logs/
-/src/main/resources/application.yaml
 /excel-test/
 /excel-data/
 /env.list
+/src/main/resources/application.dev.yaml
