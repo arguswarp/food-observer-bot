@@ -24,6 +24,7 @@ public class BotConfig {
             TelegramBotsApi botsApi = new TelegramBotsApi(DefaultBotSession.class);
             botsApi.registerBot(bot);
             addMainMenu(bot);
+            log.info("Bot successfully initialized");
             return botsApi;
         } catch (TelegramApiException e) {
             log.error("Error while bot initialization" + e.getMessage());
