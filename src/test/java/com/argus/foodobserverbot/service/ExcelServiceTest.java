@@ -70,6 +70,6 @@ class ExcelServiceTest {
                 .build();
         Mockito.when(dayRepository.findByCreatorOrderByDateDesc(Mockito.any())).thenReturn(dayRecords);
 
-        excelService.createFileAllRecords(FILE_PATH, user);
+        excelService.createExcelAllRecords(FILE_PATH, user);
     }
 }

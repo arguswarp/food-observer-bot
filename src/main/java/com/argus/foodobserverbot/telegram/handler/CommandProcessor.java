@@ -115,14 +115,14 @@ public class CommandProcessor {
                 case EXCEL_ALL_DATA -> {
                     return SendDocument.builder()
                             .chatId(chatId)
-                            .document(new InputFile(excelService.createFileAllRecords(EXCEL_PATH, botUser)))
+                            .document(new InputFile(excelService.createExcelAllRecords(EXCEL_PATH, botUser)))
                             .caption("Your file is ready " + botUser.getName())
                             .build();
                 }
                 case EXCEL_USER_DATA -> {
                     return SendDocument.builder()
                             .chatId(chatId)
-                            .document(new InputFile(excelService.createFileUserRecords(EXCEL_PATH, botUser)))
+                            .document(new InputFile(excelService.createExcelUserRecords(EXCEL_PATH, botUser)))
                             .caption("Your file is ready " + botUser.getName())
                             .build();
                 }

@@ -22,24 +22,21 @@ import java.util.List;
 
 @Service
 @Log4j2
+@Transactional
 public class ExcelService {
     private final DayRepository dayRepository;
-    private final String ALL_DATA_NAME = "all_data.xlsx";
+    private final String EXTENSION = ".xlsx";
 
     public ExcelService(DayRepository dayRepository) {
         this.dayRepository = dayRepository;
     }
 
-    @Transactional
-    public File createFileAllRecords(String path, BotUser botUser) {
+    public File createExcelAllRecords(String path, BotUser botUser) {
         try {
-            Path filePath = preparePath(path, botUser.getName());
-            if (!filePath.toFile().exists()) {
-                Files.createDirectories(filePath.getParent());
-                Files.createFile(filePath);
-            }
+            Path filePath = preparePath(path, botUser.getName(), "all_data");
+            createFileWithDirectory(filePath);
             log.info("User " + botUser.getName() + " created excel file: " + filePath.toAbsolutePath());
-            return createFile(filePath, dayRepository.findAllByOrderByDateDesc());
+            return generateExcel(filePath, dayRepository.findAllByOrderByDateDesc());
         } catch (IOException e) {
             log.error("Excel all data file error: " + e);
         }
@@ -47,16 +44,13 @@ public class ExcelService {
         return null;
     }
 
-    @Transactional
-    public File createFileUserRecords(String path, BotUser botUser) {
+    public File createExcelUserRecords(String path, BotUser botUser) {
         try {
-            Path filePath = preparePath(path, botUser.getName());
-            if (!filePath.toFile().exists()) {
-                Files.createDirectories(filePath.getParent());
-                Files.createFile(filePath);
-            }
+            String name = botUser.getName();
+            Path filePath = preparePath(path, name, name + "_data");
+            createFileWithDirectory(filePath);
             log.info("User " + botUser.getName() + " created excel file: " + filePath.toAbsolutePath());
-            return createFile(filePath, dayRepository.findByCreatorOrderByDateDesc(botUser));
+            return generateExcel(filePath, dayRepository.findByCreatorOrderByDateDesc(botUser));
         } catch (IOException e) {
             log.error("Excel user data file error: " + e);
         }
@@ -64,17 +58,28 @@ public class ExcelService {
         return null;
     }
 
-    private Path preparePath(String path, String username) throws IOException {
+    private Path preparePath(String path, String username, String filename) throws IOException {
         return Path.of(path, File.separator
                 + username + File.separator
-                + ALL_DATA_NAME);
+                + filename + EXTENSION);
     }
 
-    private File createFile(Path path, List<Day> dayList) {
+    private void createFileWithDirectory(Path path) {
+        if (!path.toFile().exists()) {
+            try {
+                Files.createDirectories(path.getParent());
+                Files.createFile(path);
+            } catch (IOException e) {
+                log.error("Error while creating file " + e);
+            }
+        }
+    }
+
+    private File generateExcel(Path path, List<Day> dayList) {
         try (Workbook workbook = new XSSFWorkbook(XSSFWorkbookType.XLSX);
              OutputStream outputStream = new BufferedOutputStream(Files.newOutputStream(path))) {
 
-            Sheet sheet = workbook.createSheet("All data");
+            Sheet sheet = workbook.createSheet("Data");
 
             sheet.setColumnWidth(0, 25 * 256);
             for (int i = 1; i < 4; i++) {

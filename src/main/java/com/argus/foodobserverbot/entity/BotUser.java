@@ -25,8 +25,10 @@ public class BotUser {
     private UserState userState;
     @Column(name = "telegram_id")
     private Long telegramId;
-    @OneToMany(mappedBy = "creator")
-    private List<Day> days;
     @Column(name = "today_mode")
     private Boolean todayMode = true;
+
+    //TODO: change to List<FoodRecord> food
+    @OneToMany(mappedBy = "creator")
+    private List<Day> days;
 }
