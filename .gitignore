@@ -36,3 +36,4 @@ build/
 /logs/
 /excel-test/
 /excel-data/
+/env.list
