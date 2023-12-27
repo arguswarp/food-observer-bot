@@ -37,3 +37,4 @@ build/
 /excel-test/
 /excel-data/
 /env.list
+/src/main/resources/application-dev.yaml
