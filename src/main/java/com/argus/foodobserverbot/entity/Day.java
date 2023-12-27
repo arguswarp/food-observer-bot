@@ -32,9 +32,8 @@ public class Day {
     private Integer pimpleBootyRating;
     @OneToMany(mappedBy = "creationDay")
     private List<FoodRecord> foodRecords;
+
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private BotUser creator;
-
-
 }

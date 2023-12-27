@@ -1,0 +1,17 @@
+server:
+  port: ${APP_PORT}
+spring:
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+  jpa:
+    generate-ddl: false
+    show-sql: false
+  liquibase:
+    enabled: true
+bot:
+  token: ${BOT_TOKEN}
+  name: ${BOT_NAME}
+excel:
+  path: ${EXCEL_PATH}

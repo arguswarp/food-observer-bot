@@ -11,13 +11,15 @@ public enum ServiceCommands {
     HELP("/help", "Shows commands", "Help"),
     CANCEL("/cancel", "Aborts selected command", "Cancel command"),
     FOOD_RECORD("/food", "Adds food record", "Food"),
-    EXCEL_ALL_DATA("/excelall", "Saves all records to excel file", "Excel report"),
+    EXCEL_ALL_DATA("/excelall", "Saves all records to excel file", "Excel all data"),
+    EXCEL_USER_DATA("/exceluser","Saves user records to excel file" , "Excel user data"),
     DAY_TODAY("/today","Saves today records", "Today"),
     DAY_YESTERDAY("/yesterday","Saves yesterday records", "Yesterday"),
     IS_BLOOD("/blood", "Sets bloody rating", "Blood"),
     IS_PIMPLE("/pimples", "Sets if there are pimples", "Pimples"),
     PIMPLE_FACE("/face", "Sets face pimples rating", "Face"),
     PIMPLE_BOOTY("/booty", "Sets booty pimples rating", "Booty");
+
     private final String command;
     private final String description;
     private final String buttonName;

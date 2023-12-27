@@ -23,6 +23,7 @@ public class FoodRecord {
     @Column(name = "created_at")
     @CreationTimestamp
     private LocalDateTime createdAt;
+
     @ManyToOne
     @JoinColumn(name = "day_id", referencedColumnName = "id")
     private Day creationDay;

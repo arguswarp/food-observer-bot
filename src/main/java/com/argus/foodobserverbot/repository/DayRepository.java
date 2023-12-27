@@ -3,7 +3,6 @@ package com.argus.foodobserverbot.repository;
 import com.argus.foodobserverbot.entity.BotUser;
 import com.argus.foodobserverbot.entity.Day;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -12,7 +11,11 @@ import java.util.Optional;
 
 @Repository
 public interface DayRepository extends JpaRepository<Day, Long> {
-    Boolean existsDayByDateIs(LocalDate date);
+    Boolean existsDayByDateIsAndCreator(LocalDate date, BotUser creator);
+
     Optional<Day> findByDate(LocalDate date);
+
     List<Day> findByCreatorOrderByDateDesc(BotUser creator);
+
+    List<Day> findAllByOrderByDateDesc();
 }

@@ -4,7 +4,6 @@ import com.argus.foodobserverbot.entity.BotUser;
 import com.argus.foodobserverbot.entity.Day;
 import com.argus.foodobserverbot.entity.FoodRecord;
 import com.argus.foodobserverbot.repository.DayRepository;
-import com.argus.foodobserverbot.repository.FoodRecordRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -12,16 +11,11 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.List;
 
 @ExtendWith(MockitoExtension.class)
 class ExcelServiceTest {
-    @Mock
-    private FoodRecordRepository foodRecordRepository;
 
     @Mock
     private DayRepository dayRepository;
@@ -49,7 +43,7 @@ class ExcelServiceTest {
                         .food("pasta")
                         .build());
 
-        List <Day> dayRecords = List.of(
+        List<Day> dayRecords = List.of(
                 Day.builder()
                         .date(LocalDate.now())
                         .bloodyRating(5)
@@ -58,7 +52,7 @@ class ExcelServiceTest {
                         .foodRecords(foodRecords1)
                         .build(),
                 Day.builder()
-                        .date(LocalDate.of(2023,12,1))
+                        .date(LocalDate.of(2023, 12, 1))
                         .bloodyRating(3)
                         .pimpleBootyRating(3)
                         .pimpleFaceRating(0)
@@ -76,6 +70,6 @@ class ExcelServiceTest {
                 .build();
         Mockito.when(dayRepository.findByCreatorOrderByDateDesc(Mockito.any())).thenReturn(dayRecords);
 
-        excelService.createExcelFileAllData(FILE_PATH, user);
+        excelService.createExcelAllRecords(FILE_PATH, user);
     }
 }

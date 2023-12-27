@@ -64,8 +64,8 @@ public class CommandProcessor {
                             .replyMarkup(menuService.createTwoRowReplyKeyboard(
                                     List.of(FOOD_RECORD.getButtonName(), IS_BLOOD.getButtonName(), IS_PIMPLE.getButtonName(), CANCEL.getButtonName()),
                                     List.of(FOOD_RECORD.getCommand(), IS_BLOOD.getCommand(), IS_PIMPLE.getCommand(), CANCEL.getCommand()),
-                                    List.of("Change mode", "Excel report"),
-                                    List.of(MODE.getCommand(), EXCEL_ALL_DATA.getCommand())
+                                    List.of("Change mode", EXCEL_USER_DATA.getButtonName(), EXCEL_ALL_DATA.getButtonName()),
+                                    List.of(MODE.getCommand(), EXCEL_USER_DATA.getCommand(), EXCEL_ALL_DATA.getCommand())
                             ))
                             .build();
                 }
@@ -115,7 +115,14 @@ public class CommandProcessor {
                 case EXCEL_ALL_DATA -> {
                     return SendDocument.builder()
                             .chatId(chatId)
-                            .document(new InputFile(excelService.createExcelFileAllData(EXCEL_PATH, botUser)))
+                            .document(new InputFile(excelService.createExcelAllRecords(EXCEL_PATH, botUser)))
+                            .caption("Your file is ready " + botUser.getName())
+                            .build();
+                }
+                case EXCEL_USER_DATA -> {
+                    return SendDocument.builder()
+                            .chatId(chatId)
+                            .document(new InputFile(excelService.createExcelUserRecords(EXCEL_PATH, botUser)))
                             .caption("Your file is ready " + botUser.getName())
                             .build();
                 }
