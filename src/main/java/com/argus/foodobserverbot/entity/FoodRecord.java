@@ -24,7 +24,6 @@ public class FoodRecord {
     @CreationTimestamp
     private LocalDateTime createdAt;
 
-    //TODO: change to BotUser creator
     @ManyToOne
     @JoinColumn(name = "day_id", referencedColumnName = "id")
     private Day creationDay;

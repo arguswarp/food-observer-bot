@@ -28,7 +28,6 @@ public class BotUser {
     @Column(name = "today_mode")
     private Boolean todayMode = true;
 
-    //TODO: change to List<FoodRecord> food
     @OneToMany(mappedBy = "creator")
     private List<Day> days;
 }

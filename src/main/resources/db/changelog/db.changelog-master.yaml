@@ -11,3 +11,7 @@ databaseChangeLog:
       file: db/changelog/changeset/alter-table-day.pimple.ratings.sql
   - include:
       file: db/changelog/changeset/alter-table-bot_user.add_mode.sql
+  - include:
+      file: db/changelog/changeset/7_alter-table-day.delete_unique_date-rating_constraints.sql
+  - include:
+      file: db/changelog/changeset/8_alter-table-day.date_index.sql

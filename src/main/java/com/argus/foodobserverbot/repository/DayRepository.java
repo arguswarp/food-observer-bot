@@ -11,7 +11,7 @@ import java.util.Optional;
 
 @Repository
 public interface DayRepository extends JpaRepository<Day, Long> {
-    Boolean existsDayByDateIs(LocalDate date);
+    Boolean existsDayByDateIsAndCreator(LocalDate date, BotUser creator);
 
     Optional<Day> findByDate(LocalDate date);
 

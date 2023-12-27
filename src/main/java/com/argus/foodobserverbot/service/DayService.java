@@ -22,7 +22,7 @@ public class DayService {
     }
 
     public Day findOrSaveDay(BotUser botUser, LocalDate date) {
-        if (!dayRepository.existsDayByDateIs(date)) {
+        if (!dayRepository.existsDayByDateIsAndCreator(date, botUser)) {
             var day = Day.builder()
                     .date(date)
                     .creator(botUser)
