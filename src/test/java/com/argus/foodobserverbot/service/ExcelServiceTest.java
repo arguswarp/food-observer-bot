@@ -67,9 +67,8 @@ class ExcelServiceTest {
         );
         BotUser user = BotUser.builder()
                 .name("Porfiriy")
+                .days(dayRecords)
                 .build();
-        Mockito.when(dayRepository.findByCreatorOrderByDateDesc(Mockito.any())).thenReturn(dayRecords);
-
-        excelService.createExcelAllRecords(FILE_PATH, user);
+        excelService.createExcelUserRecords(FILE_PATH, user);
     }
 }

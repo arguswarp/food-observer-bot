@@ -4,6 +4,7 @@ import com.argus.foodobserverbot.entity.BotUser;
 import com.argus.foodobserverbot.entity.Day;
 import com.argus.foodobserverbot.entity.FoodRecord;
 import com.argus.foodobserverbot.repository.DayRepository;
+import lombok.NonNull;
 import lombok.extern.log4j.Log4j2;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -50,7 +51,7 @@ public class ExcelService {
             Path filePath = preparePath(path, name, name + "_data");
             createFileWithDirectory(filePath);
             log.info("User " + botUser.getName() + " created excel file: " + filePath.toAbsolutePath());
-            return generateExcel(filePath, dayRepository.findByCreatorOrderByDateDesc(botUser));
+            return generateExcel(filePath, botUser.getDays());
         } catch (IOException e) {
             log.error("Excel user data file error: " + e);
         }
@@ -75,7 +76,7 @@ public class ExcelService {
         }
     }
 
-    private File generateExcel(Path path, List<Day> dayList) {
+    private File generateExcel(Path path, @NonNull List<Day> dayList) {
         try (Workbook workbook = new XSSFWorkbook(XSSFWorkbookType.XLSX);
              OutputStream outputStream = new BufferedOutputStream(Files.newOutputStream(path))) {
 
