@@ -6,19 +6,20 @@ import java.util.Arrays;
 
 public enum ServiceCommands {
     START("/start", "Starts the bot", "Start"),
-    RECORD("/record", "Call menu to make day record", "Add record"),
-    MODE("/mode", "Change record mode", "Mode"),
     HELP("/help", "Shows commands", "Help"),
+    RECORD("/record", "Call menu to make day record", "Add record"),
+    NOTE("/note", "Add note to day record", "Add note"),
     CANCEL("/cancel", "Aborts selected command", "Cancel command"),
-    FOOD_RECORD("/food", "Adds food record", "Food"),
-    EXCEL_ALL_DATA("/excelall", "Saves all records to excel file", "Excel all data"),
-    EXCEL_USER_DATA("/exceluser","Saves user records to excel file" , "Excel user data"),
+    MODE("/mode", "Change record mode", "Mode"),
     DAY_TODAY("/today","Saves today records", "Today"),
     DAY_YESTERDAY("/yesterday","Saves yesterday records", "Yesterday"),
+    FOOD_RECORD("/food", "Adds food record", "Food"),
     IS_BLOOD("/blood", "Sets bloody rating", "Blood"),
     IS_PIMPLE("/pimples", "Sets if there are pimples", "Pimples"),
     PIMPLE_FACE("/face", "Sets face pimples rating", "Face"),
-    PIMPLE_BOOTY("/booty", "Sets booty pimples rating", "Booty");
+    PIMPLE_BOOTY("/booty", "Sets booty pimples rating", "Booty"),
+    EXCEL_USER_DATA("/exceluser","Saves user records to excel file" , "Excel user data"),
+    EXCEL_ALL_DATA("/excelall", "Saves all records to excel file", "Excel all data");
 
     private final String command;
     private final String description;

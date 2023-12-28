@@ -1,5 +1,6 @@
 package com.argus.foodobserverbot.service;
 
+import com.argus.foodobserverbot.entity.BotUser;
 import com.argus.foodobserverbot.entity.FoodRecord;
 import com.argus.foodobserverbot.exception.DatabaseException;
 import com.argus.foodobserverbot.repository.DayRepository;
@@ -21,8 +22,8 @@ public class FoodRecordService {
         this.dayRepository = dayRepository;
     }
 
-    public FoodRecord addFood(String text, LocalDate date) {
-        var day = dayRepository.findByDate(date)
+    public FoodRecord addFood(String text, LocalDate date, BotUser botUser) {
+        var day = dayRepository.findByDateAndCreator(date, botUser)
                 .orElseThrow(() -> new DatabaseException("Can't find the day"));
         var foodRecord = FoodRecord.builder()
                 .food(text)

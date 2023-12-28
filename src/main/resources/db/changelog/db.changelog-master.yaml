@@ -15,3 +15,5 @@ databaseChangeLog:
       file: db/changelog/changeset/7_alter-table-day.delete_unique_date-rating_constraints.sql
   - include:
       file: db/changelog/changeset/8_alter-table-day.date_index.sql
+  - include:
+      file: db/changelog/changeset/9_alter-table-day.add_notes.sql

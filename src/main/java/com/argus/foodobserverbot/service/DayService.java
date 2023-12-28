@@ -29,17 +29,27 @@ public class DayService {
                     .bloodyRating(0)
                     .pimpleFaceRating(0)
                     .pimpleBootyRating(0)
+                    .notes("")
                     .build();
             log.info("User " + botUser.getName() + " started day record on " + day.getDate());
             return dayRepository.save(day);
         }
-        return dayRepository.findByDate(date).orElseThrow(() -> new DatabaseException("Can't save or find day"));
+        return dayRepository.findByDateAndCreator(date, botUser).orElseThrow(() -> new DatabaseException("Can't save or find day"));
     }
 
-    public Day setDayRating(int rating, LocalDate date, BiConsumer<Integer, Day> dayConsumer) {
-        var dayOptional = dayRepository.findByDate(date);
+    public Day setDayRating(int rating, LocalDate date, BotUser botUser, BiConsumer<Integer, Day> dayConsumer) {
+        var dayOptional = dayRepository.findByDateAndCreator(date, botUser);
         var day = dayOptional.orElseThrow(() -> new DatabaseException("Can't find today"));
         dayConsumer.accept(rating, day);
+        return dayRepository.save(day);
+    }
+
+    public Day addNote(String note, LocalDate date, BotUser botUser) {
+        var dayOptional = dayRepository.findByDateAndCreator(date, botUser);
+        var day = dayOptional.orElseThrow(() -> new DatabaseException("Can't find today"));
+        String noteTransient = day.getNotes();
+        noteTransient +=note + "\n";
+        day.setNotes(noteTransient);
         return dayRepository.save(day);
     }
 }

@@ -64,9 +64,19 @@ public class CommandProcessor {
                             .replyMarkup(menuService.createTwoRowReplyKeyboard(
                                     List.of(FOOD_RECORD.getButtonName(), IS_BLOOD.getButtonName(), IS_PIMPLE.getButtonName(), CANCEL.getButtonName()),
                                     List.of(FOOD_RECORD.getCommand(), IS_BLOOD.getCommand(), IS_PIMPLE.getCommand(), CANCEL.getCommand()),
-                                    List.of("Change mode", EXCEL_USER_DATA.getButtonName(), EXCEL_ALL_DATA.getButtonName()),
-                                    List.of(MODE.getCommand(), EXCEL_USER_DATA.getCommand(), EXCEL_ALL_DATA.getCommand())
+                                    List.of(NOTE.getButtonName(), "Change mode", EXCEL_USER_DATA.getButtonName(), EXCEL_ALL_DATA.getButtonName()),
+                                    List.of(NOTE.getCommand(), MODE.getCommand(), EXCEL_USER_DATA.getCommand(), EXCEL_ALL_DATA.getCommand())
                             ))
+                            .build();
+                }
+                case NOTE -> {
+                    newRecord(botUser, INPUT_NOTE, NOTE);
+                    return SendMessage.builder()
+                            .chatId(chatId)
+                            .text("Enter note")
+                            .replyMarkup(menuService.createOneRowReplyKeyboard(
+                                    List.of(CANCEL.getButtonName()),
+                                    List.of(CANCEL.getCommand())))
                             .build();
                 }
                 case MODE -> {

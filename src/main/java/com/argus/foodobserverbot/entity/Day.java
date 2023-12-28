@@ -30,6 +30,9 @@ public class Day {
 
     @Column(name = "pimple_booty_rating")
     private Integer pimpleBootyRating;
+
+    @Column(name = "notes")
+    private String notes;
     @OneToMany(mappedBy = "creationDay")
     private List<FoodRecord> foodRecords;
 

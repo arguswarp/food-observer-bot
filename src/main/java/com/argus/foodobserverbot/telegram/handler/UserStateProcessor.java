@@ -36,7 +36,7 @@ public class UserStateProcessor {
         var userState = botUser.getUserState();
         switch (userState) {
             case INPUT_FOOD -> {
-                var food = foodRecordService.addFood(text, botUserService.selectDate(botUser));
+                var food = foodRecordService.addFood(text, botUserService.selectDate(botUser), botUser);
                 var user = botUserService.changeState(botUser, BASIC_STATE);
                 log.info("User " + user.getName()
                         + " new food input " + food.getFood());
@@ -46,6 +46,20 @@ public class UserStateProcessor {
                         .replyMarkup(menuService.createOneRowReplyKeyboard(
                                 List.of("Another food", "Another record", "Cancel"),
                                 List.of(FOOD_RECORD.getCommand(), RECORD.getCommand(), CANCEL.getCommand())
+                        ))
+                        .build();
+            }
+            case INPUT_NOTE -> {
+                var day = dayService.addNote(text, botUserService.selectDate(botUser), botUser);
+                var user = botUserService.changeState(botUser, BASIC_STATE);
+                log.info("User " + user.getName()
+                        + " new note: " + text + "; on day " + day.getDate());
+                return SendMessage.builder()
+                        .chatId(chatId)
+                        .text("You added note")
+                        .replyMarkup(menuService.createOneRowReplyKeyboard(
+                                List.of("Another note", RECORD.getButtonName(), "Cancel"),
+                                List.of(NOTE.getCommand(), RECORD.getCommand(), CANCEL.getCommand())
                         ))
                         .build();
             }
@@ -81,7 +95,7 @@ public class UserStateProcessor {
             final var userState = botUser.getUserState();
             int rating = Integer.parseInt(text);
             var date = botUserService.selectDate(botUser);
-            dayService.setDayRating(rating, date, consumer);
+            dayService.setDayRating(rating, date, botUser, consumer);
             var user = botUserService.changeState(botUser, BASIC_STATE);
             log.info(userState + " day rating is updated by " + user.getName()
                     + " new value is " + rating);
