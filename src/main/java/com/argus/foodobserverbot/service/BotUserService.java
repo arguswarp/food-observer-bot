@@ -41,6 +41,7 @@ public class BotUserService {
                     .telegramId(telegramId)
                     .name(name)
                     .userState(BASIC_STATE)
+                    .todayMode(true)
                     .build();
             log.info("User is created: " + transientAppUser.getName() + " with id " + transientAppUser.getId());
             return botUserRepository.save(transientAppUser);
