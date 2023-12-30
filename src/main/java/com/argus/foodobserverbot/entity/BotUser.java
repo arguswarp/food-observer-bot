@@ -26,7 +26,7 @@ public class BotUser {
     @Column(name = "telegram_id")
     private Long telegramId;
     @Column(name = "today_mode")
-    private Boolean todayMode = true;
+    private Boolean todayMode;
 
     @OneToMany(mappedBy = "creator")
     private List<Day> days;
