@@ -22,7 +22,7 @@ services:
     networks:
       - fobs-net
   db:
-    image: postgres:$PG_VERSION-alpine
+    image: postgres:$PG_VERSION
     container_name: fobs-db
     environment:
       - POSTGRES_USER=$DB_USERNAME
