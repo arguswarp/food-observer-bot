@@ -23,7 +23,6 @@ import java.util.List;
 
 @Service
 @Log4j2
-@Transactional
 public class ExcelService {
     private final DayRepository dayRepository;
     private final String EXTENSION = ".xlsx";
@@ -31,7 +30,7 @@ public class ExcelService {
     public ExcelService(DayRepository dayRepository) {
         this.dayRepository = dayRepository;
     }
-
+    @Transactional
     public File createExcelAllRecords(String path, BotUser botUser) {
         try {
             Path filePath = preparePath(path, botUser.getName(), "all_data");
@@ -44,14 +43,15 @@ public class ExcelService {
         //TODO: find better solution
         return null;
     }
-
+    @Transactional
     public File createExcelUserRecords(String path, BotUser botUser) {
         try {
             String name = botUser.getName();
             Path filePath = preparePath(path, name, name + "_data");
             createFileWithDirectory(filePath);
             log.info("User " + botUser.getName() + " created excel file: " + filePath.toAbsolutePath());
-            return generateExcel(filePath, botUser.getDays());
+            var days = dayRepository.findByCreatorOrderByDateDesc(botUser);
+            return generateExcel(filePath, days);
         } catch (IOException e) {
             log.error("Excel user data file error: " + e);
         }

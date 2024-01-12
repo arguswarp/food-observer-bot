@@ -16,4 +16,6 @@ public interface DayRepository extends JpaRepository<Day, Long> {
     Optional<Day> findByDateAndCreator(LocalDate date, BotUser creator);
 
     List<Day> findAllByOrderByDateDesc();
+
+    List<Day> findByCreatorOrderByDateDesc(BotUser creator);
 }

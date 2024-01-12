@@ -3,12 +3,9 @@ package com.argus.foodobserverbot.service;
 import com.argus.foodobserverbot.entity.BotUser;
 import com.argus.foodobserverbot.entity.Day;
 import com.argus.foodobserverbot.entity.FoodRecord;
-import com.argus.foodobserverbot.repository.DayRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
@@ -16,9 +13,6 @@ import java.util.List;
 
 @ExtendWith(MockitoExtension.class)
 class ExcelServiceTest {
-
-    @Mock
-    private DayRepository dayRepository;
 
     @InjectMocks
     private ExcelService excelService;

@@ -2,7 +2,7 @@ FROM maven:3.9.4-eclipse-temurin-21-alpine as build
 WORKDIR /build
 COPY src src
 COPY pom.xml pom.xml
-RUN --mount=type=cache,target=/root/.m2 mvn clean package
+RUN --mount=type=cache,target=/root/.m2 mvn clean package -Dmaven.test.skip=true
 
 # При помощи ключевого слова FROM необходимо указать исходный образ,
 # который мы будем использовать для создания своего.

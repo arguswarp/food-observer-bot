@@ -21,6 +21,7 @@ services:
       - $APP_PORT:8082
     networks:
       - fobs-net
+    restart: unless-stopped
   db:
     image: postgres:$PG_VERSION
     container_name: fobs-db
