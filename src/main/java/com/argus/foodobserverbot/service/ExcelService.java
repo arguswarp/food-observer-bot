@@ -83,7 +83,7 @@ public class ExcelService {
             Sheet sheet = workbook.createSheet("Data");
 
             sheet.setColumnWidth(0, 25 * 256);
-            for (int i = 1; i < 4; i++) {
+            for (int i = 1; i < 5; i++) {
                 sheet.setColumnWidth(i, 15 * 256);
             }
 
@@ -97,16 +97,20 @@ public class ExcelService {
             header.createCell(1).setCellValue("Bloody rating");
             header.createCell(2).setCellValue("Booty pimples");
             header.createCell(3).setCellValue("Face pimples");
+            header.createCell(4).setCellValue("Notes");
 
             shift++;
 
             for (Day day : dayList) {
                 Row dayRow = sheet.createRow(dayList.indexOf(day) + shift);
-                Cell cell = dayRow.createCell(0);
-                cell.setCellValue(day.getDate().format(DateTimeFormatter.ISO_DATE));
+                Cell cellDate = dayRow.createCell(0);
+                cellDate.setCellValue(day.getDate().format(DateTimeFormatter.ISO_DATE));
                 dayRow.createCell(1).setCellValue(day.getBloodyRating());
                 dayRow.createCell(2).setCellValue(day.getPimpleBootyRating());
                 dayRow.createCell(3).setCellValue(day.getPimpleFaceRating());
+                Cell cellNotes = dayRow.createCell(4);
+                cellNotes.setCellStyle(style);
+                cellNotes.setCellValue(day.getNotes());
 
                 List<FoodRecord> foodRecords = day.getFoodRecords();
 

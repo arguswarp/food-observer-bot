@@ -3,9 +3,12 @@ package com.argus.foodobserverbot.service;
 import com.argus.foodobserverbot.entity.BotUser;
 import com.argus.foodobserverbot.entity.Day;
 import com.argus.foodobserverbot.entity.FoodRecord;
+import com.argus.foodobserverbot.repository.DayRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
@@ -13,7 +16,8 @@ import java.util.List;
 
 @ExtendWith(MockitoExtension.class)
 class ExcelServiceTest {
-
+    @Mock
+    private DayRepository dayRepository;
     @InjectMocks
     private ExcelService excelService;
 
@@ -43,6 +47,8 @@ class ExcelServiceTest {
                         .bloodyRating(5)
                         .pimpleBootyRating(6)
                         .pimpleFaceRating(3)
+                        .notes("Some note \n" +
+                                "Another note")
                         .foodRecords(foodRecords1)
                         .build(),
                 Day.builder()
@@ -63,6 +69,9 @@ class ExcelServiceTest {
                 .name("Porfiriy")
                 .days(dayRecords)
                 .build();
+
+        Mockito.when(dayRepository.findByCreatorOrderByDateDesc(user)).thenReturn(dayRecords);
+
         excelService.createExcelUserRecords(FILE_PATH, user);
     }
 }

@@ -27,7 +27,7 @@ public class BotConfig {
             log.info("Bot successfully initialized");
             return botsApi;
         } catch (TelegramApiException e) {
-            log.error("Error while bot initialization" + e.getMessage());
+            log.error("Error while bot initialization " + e.getMessage());
         }
         return null;
     }
