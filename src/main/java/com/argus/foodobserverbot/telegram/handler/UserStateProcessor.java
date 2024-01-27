@@ -43,10 +43,7 @@ public class UserStateProcessor {
                 return SendMessage.builder()
                         .chatId(chatId)
                         .text("You added food record")
-                        .replyMarkup(menuService.createOneRowReplyKeyboard(
-                                List.of("Another food", "Another record", "Cancel"),
-                                List.of(FOOD_RECORD.getCommand(), RECORD.getCommand(), CANCEL.getCommand())
-                        ))
+                        .replyMarkup(menuService.createOneRowReplyKeyboard(FOOD_RECORD, RECORD, CANCEL))
                         .build();
             }
             case INPUT_NOTE -> {
@@ -57,10 +54,7 @@ public class UserStateProcessor {
                 return SendMessage.builder()
                         .chatId(chatId)
                         .text("You added note")
-                        .replyMarkup(menuService.createOneRowReplyKeyboard(
-                                List.of("Another note", RECORD.getButtonName(), "Cancel"),
-                                List.of(NOTE.getCommand(), RECORD.getCommand(), CANCEL.getCommand())
-                        ))
+                        .replyMarkup(menuService.createOneRowReplyKeyboard(NOTE, RECORD, CANCEL))
                         .build();
             }
             case INPUT_BLOOD_RATE -> {
@@ -80,10 +74,7 @@ public class UserStateProcessor {
                 return SendMessage.builder()
                         .chatId(chatId)
                         .text("Unknown error! Enter /cancel and try again!")
-                        .replyMarkup(menuService.createOneRowReplyKeyboard(
-                                List.of("Cancel"),
-                                List.of(CANCEL.getCommand())
-                        ))
+                        .replyMarkup(menuService.createOneRowReplyKeyboard(CANCEL))
                         .build();
             }
         }

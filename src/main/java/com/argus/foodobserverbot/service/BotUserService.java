@@ -1,9 +1,12 @@
 package com.argus.foodobserverbot.service;
 
 import com.argus.foodobserverbot.entity.BotUser;
+import com.argus.foodobserverbot.entity.Day;
+import com.argus.foodobserverbot.entity.FoodRecord;
 import com.argus.foodobserverbot.entity.enums.UserState;
 import com.argus.foodobserverbot.exception.EmptyUpdateException;
 import com.argus.foodobserverbot.repository.BotUserRepository;
+import com.argus.foodobserverbot.repository.DayRepository;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,6 +14,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 import static com.argus.foodobserverbot.entity.enums.UserState.BASIC_STATE;
@@ -21,8 +25,11 @@ import static com.argus.foodobserverbot.entity.enums.UserState.BASIC_STATE;
 public class BotUserService {
     private final BotUserRepository botUserRepository;
 
-    public BotUserService(BotUserRepository botUserRepository) {
+    private final DayRepository dayRepository;
+
+    public BotUserService(BotUserRepository botUserRepository, DayRepository dayRepository) {
         this.botUserRepository = botUserRepository;
+        this.dayRepository = dayRepository;
     }
 
     public BotUser findOrSaveAppUser(Update update) {
@@ -57,6 +64,12 @@ public class BotUserService {
     public BotUser changeTodayMode(BotUser botUser, boolean mode) {
         botUser.setTodayMode(mode);
         return botUserRepository.save(botUser);
+    }
+    @Transactional(readOnly = true)
+    public List<FoodRecord> getTodayFoodRecords(BotUser botUser) {
+        return dayRepository.findByDateAndCreator(LocalDate.now(), botUser)
+                .map(Day::getFoodRecords)
+                .orElse(null);
     }
 
     @Transactional(readOnly = true)

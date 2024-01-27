@@ -78,7 +78,7 @@ class CommandProcessorTest {
                 Mockito.any())).thenReturn(day);
         Mockito.when(botUserService.changeState(Mockito.any(BotUser.class), Mockito.any()))
                 .thenReturn(botUser);
-        Mockito.when(menuService.createOneRowReplyKeyboard(Mockito.any(), Mockito.any()))
+        Mockito.when(menuService.createOneRowReplyKeyboard(Mockito.any()))
                 .thenReturn(ReplyKeyboardMarkup.builder().build());
 
         SendMessage sendMessage = (SendMessage) commandProcessor.process(botUser, CHAT_ID, FOOD_RECORD.getCommand());
