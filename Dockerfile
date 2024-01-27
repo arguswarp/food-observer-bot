@@ -43,4 +43,4 @@ EXPOSE 8082
 # можно было передать в строку запуска дополнительные параметры запуска - JAVA_OPTS, а так же
 # ${0} и ${@} для передачи аргументов запуска.
 
-ENTRYPOINT exec java ${JAVA_OPTS} -jar application.jar ${0} ${@}
+CMD exec java ${JAVA_OPTS} -jar application.jar ${0} ${@}
