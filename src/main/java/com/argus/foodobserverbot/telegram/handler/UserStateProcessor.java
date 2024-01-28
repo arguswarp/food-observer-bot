@@ -43,7 +43,7 @@ public class UserStateProcessor {
                 return SendMessage.builder()
                         .chatId(chatId)
                         .text("You added food record")
-                        .replyMarkup(menuService.createOneRowReplyKeyboard(FOOD_RECORD, RECORD, CANCEL))
+                        .replyMarkup(menuService.createOneRowReplyKeyboard(FOOD_RECORD, SHOW, RECORD, CANCEL))
                         .build();
             }
             case INPUT_NOTE -> {
@@ -54,7 +54,7 @@ public class UserStateProcessor {
                 return SendMessage.builder()
                         .chatId(chatId)
                         .text("You added note")
-                        .replyMarkup(menuService.createOneRowReplyKeyboard(NOTE, RECORD, CANCEL))
+                        .replyMarkup(menuService.createOneRowReplyKeyboard(NOTE, SHOW_NOTES, RECORD, CANCEL))
                         .build();
             }
             case INPUT_BLOOD_RATE -> {

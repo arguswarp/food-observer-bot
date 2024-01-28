@@ -72,6 +72,12 @@ public class BotUserService {
                 .orElse(List.of());
     }
 
+    public String getTodayNotes(BotUser botUser) {
+        return dayRepository.findByDateAndCreator(LocalDate.now(), botUser)
+                .map(Day::getNotes)
+                .orElse("");
+    }
+
     @Transactional(readOnly = true)
     public LocalDate selectDate(BotUser botUser) {
         return botUser.getTodayMode() ? LocalDate.now() : LocalDate.now().minusDays(1);

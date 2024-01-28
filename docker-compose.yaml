@@ -4,21 +4,20 @@ services:
   app:
     image: ghcr.io/arguswarp/food-observer-bot:latest
     container_name: fobs-maven
+
     build:
       context: .
       dockerfile: Dockerfile
     depends_on:
       - db
     environment:
-      - APP_PORT=$APP_PORT
       - DB_URL=$DB_URL
       - DB_USERNAME=$DB_USERNAME
       - DB_PASSWORD=$DB_PASSWORD
       - BOT_TOKEN=$BOT_TOKEN
       - BOT_NAME=$BOT_NAME
       - EXCEL_PATH=$EXCEL_PATH
-    ports:
-      - $APP_PORT:8082
+      - TZ=$TIME_ZONE
     networks:
       - fobs-net
     restart: unless-stopped

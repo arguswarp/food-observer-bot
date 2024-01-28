@@ -63,8 +63,8 @@ public class CommandProcessor {
                             .chatId(chatId)
                             .text("Choose the record type to add")
                             .replyMarkup(menuService.createTwoRowReplyKeyboard(
-                                    List.of(FOOD_RECORD, IS_BLOOD, IS_PIMPLE, CANCEL),
-                                    List.of(NOTE, MODE, SHOW, EXCEL_USER_DATA)
+                                    List.of(FOOD_RECORD, IS_BLOOD, IS_PIMPLE, NOTE),
+                                    List.of(SHOW, SHOW_NOTES, EXCEL_USER_DATA, CANCEL)
                             ))
                             .build();
                 }
@@ -78,12 +78,23 @@ public class CommandProcessor {
                 }
                 case SHOW -> {
                     var foodRecords = botUserService.getTodayFoodRecords(botUser);
-                    var s = foodRecords.stream().map(foodRecord -> foodRecord.getCreatedAt().format(DateTimeFormatter.ofPattern("HH:mm")) + " " + foodRecord.getFood())
-                            .reduce((s1, s2) -> s1 + "\n" + s2).orElse("No records today");
+                    var foodRecordsText = foodRecords.stream()
+                            .map(foodRecord -> foodRecord.getCreatedAt()
+                                    .format(DateTimeFormatter.ofPattern("HH:mm")) + " " + foodRecord.getFood())
+                            .reduce((s1, s2) -> s1 + "\n" + s2)
+                            .orElse("No records added yet");
                     return SendMessage.builder()
                             .chatId(chatId)
-                            .text(s)
-                            .replyMarkup(menuService.createOneRowReplyKeyboard(RECORD, CANCEL))
+                            .text(foodRecordsText)
+                            .replyMarkup(menuService.createOneRowReplyKeyboard(FOOD_RECORD, RECORD, CANCEL))
+                            .build();
+                }
+                case SHOW_NOTES -> {
+                    var notes = botUserService.getTodayNotes(botUser);
+                    return SendMessage.builder()
+                            .chatId(chatId)
+                            .text(notes.isBlank() ? "No notes added yet" : notes)
+                            .replyMarkup(menuService.createOneRowReplyKeyboard(NOTE, RECORD, CANCEL))
                             .build();
                 }
                 case MODE -> {
