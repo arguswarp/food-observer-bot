@@ -69,7 +69,7 @@ public class BotUserService {
     public List<FoodRecord> getTodayFoodRecords(BotUser botUser) {
         return dayRepository.findByDateAndCreator(LocalDate.now(), botUser)
                 .map(Day::getFoodRecords)
-                .orElse(null);
+                .orElse(List.of());
     }
 
     @Transactional(readOnly = true)
