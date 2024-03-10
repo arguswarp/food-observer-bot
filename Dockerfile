@@ -27,6 +27,8 @@ VOLUME /tmp
 
 ARG JAR_FILE=food-observer-bot-0.0.1-SNAPSHOT.jar
 
+ARG JAVA_OPTS=-"-XX:+UseSerialGC -Xss512k -XX:MaxRAM=100m"
+
 # Создадим рабочую директорию проекта
 
 WORKDIR /application
@@ -39,4 +41,4 @@ COPY --from=build /build/target/${JAR_FILE} application.jar
 # можно было передать в строку запуска дополнительные параметры запуска - JAVA_OPTS, а так же
 # ${0} и ${@} для передачи аргументов запуска.
 
-CMD exec java ${JAVA_OPTS} -jar application.jar ${0} ${@}
+ENTRYPOINT exec java ${JAVA_OPTS} -jar application.jar ${0} ${@}

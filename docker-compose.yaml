@@ -1,10 +1,10 @@
-version: '0.1'
+version: '0.2'
 
 services:
   app:
     image: ghcr.io/arguswarp/food-observer-bot:latest
     container_name: fobs-maven
-
+    mem_limit: 150m
     build:
       context: .
       dockerfile: Dockerfile

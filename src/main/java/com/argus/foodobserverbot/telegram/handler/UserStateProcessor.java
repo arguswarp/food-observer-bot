@@ -10,7 +10,6 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 
-import java.util.List;
 import java.util.function.BiConsumer;
 
 import static com.argus.foodobserverbot.entity.enums.UserState.BASIC_STATE;

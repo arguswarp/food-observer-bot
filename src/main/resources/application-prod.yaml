@@ -1,5 +1,10 @@
 server:
   port: -1
+  tomcat:
+    accept-count: 50
+    threads:
+      max: 50
+    connection-timeout: 5s
 spring:
   datasource:
     url: ${DB_URL}
