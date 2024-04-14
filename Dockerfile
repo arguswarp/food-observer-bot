@@ -27,7 +27,7 @@ VOLUME /tmp
 
 ARG JAR_FILE=food-observer-bot-0.0.1-SNAPSHOT.jar
 
-ARG JAVA_OPTS=-"-XX:+UseSerialGC -Xss512k -XX:MaxRAM=100m"
+ARG JAVA_OPTS=-"-XX:+UseSerialGC -Xss512k -XX:MaxRAM=200m"
 
 # Создадим рабочую директорию проекта
 

@@ -27,7 +27,7 @@ public class BotConfig {
             log.info("Bot successfully initialized");
             return botsApi;
         } catch (TelegramApiException e) {
-            log.error("Error while bot initialization " + e.getMessage());
+            log.error("Error while bot initialization {}", e.getMessage());
         }
         return null;
     }
@@ -40,7 +40,7 @@ public class BotConfig {
         try {
             bot.execute(new SetMyCommands(commandList, new BotCommandScopeDefault(), null));
         } catch (TelegramApiException e) {
-            log.error("Error while initializing main menu " + e.getMessage());
+            log.error("Error while initializing main menu {}", e.getMessage());
         }
     }
 }

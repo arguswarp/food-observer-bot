@@ -49,7 +49,7 @@ public class CommandProcessor {
                             .chatId(chatId)
                             .text("Hello there, " + botUser.getName() + "!"
                                     + " Enter /help to see available commands")
-                            .replyMarkup(menuService.createMainMenu())
+                            .replyMarkup(menuService.createOneRowReplyKeyboard(MENU, HELP))
                             .build();
                 }
                 case HELP -> {
@@ -58,13 +58,13 @@ public class CommandProcessor {
                             .text(help(botUser))
                             .build();
                 }
-                case RECORD -> {
+                case MENU -> {
                     return SendMessage.builder()
                             .chatId(chatId)
                             .text("Choose the record type to add")
                             .replyMarkup(menuService.createTwoRowReplyKeyboard(
                                     List.of(FOOD_RECORD, IS_BLOOD, IS_PIMPLE, NOTE),
-                                    List.of(SHOW, SHOW_NOTES, EXCEL_USER_DATA, CANCEL)
+                                    List.of(SHOW, SHOW_NOTES, EXCEL_USER_DATA)
                             ))
                             .build();
                 }
@@ -73,7 +73,7 @@ public class CommandProcessor {
                     return SendMessage.builder()
                             .chatId(chatId)
                             .text("Enter note")
-                            .replyMarkup(menuService.createOneRowReplyKeyboard(RECORD, NOTE, CANCEL))
+                            .replyMarkup(menuService.createOneRowReplyKeyboard(MODE, CANCEL))
                             .build();
                 }
                 case SHOW -> {
@@ -86,7 +86,10 @@ public class CommandProcessor {
                     return SendMessage.builder()
                             .chatId(chatId)
                             .text(foodRecordsText)
-                            .replyMarkup(menuService.createOneRowReplyKeyboard(FOOD_RECORD, RECORD, CANCEL))
+                            .replyMarkup(menuService.createTwoRowReplyKeyboard(
+                                    List.of(FOOD_RECORD, IS_BLOOD, IS_PIMPLE, NOTE),
+                                    List.of(SHOW, SHOW_NOTES, EXCEL_USER_DATA)
+                            ))
                             .build();
                 }
                 case SHOW_NOTES -> {
@@ -94,7 +97,10 @@ public class CommandProcessor {
                     return SendMessage.builder()
                             .chatId(chatId)
                             .text(notes.isBlank() ? "No notes added yet" : notes)
-                            .replyMarkup(menuService.createOneRowReplyKeyboard(NOTE, RECORD, CANCEL))
+                            .replyMarkup(menuService.createTwoRowReplyKeyboard(
+                                    List.of(FOOD_RECORD, IS_BLOOD, IS_PIMPLE, NOTE),
+                                    List.of(SHOW, SHOW_NOTES, EXCEL_USER_DATA)
+                            ))
                             .build();
                 }
                 case MODE -> {
@@ -106,22 +112,64 @@ public class CommandProcessor {
                 }
                 case DAY_TODAY -> {
                     var user = botUserService.changeTodayMode(botUser, true);
+                    var state = botUser.getUserState();
+                    String commandText = "";
+
+                    if (state.equals(INPUT_FOOD)) {
+                        commandText = "Enter food. ";
+                    }
+                    if (state.equals(INPUT_NOTE)) {
+                        commandText = "Enter note. ";
+                    }
+
+                    if (state.equals(INPUT_BLOOD_RATE)) {
+                        commandText = "How bloody? From 0 to 10. ";
+                    }
+
+                    if (state.equals(INPUT_PIMPLE_RATE_FACE)) {
+                        commandText = "How much face pimples? From 0 to 10. ";
+                    }
+
                     log.info("User " + user.getName()
                             + " changed mode to " + DAY_TODAY.getCommand());
                     return SendMessage.builder()
                             .chatId(chatId)
-                            .text("You now saving today records")
-                            .replyMarkup(menuService.createOneRowReplyKeyboard(RECORD, MODE, CANCEL))
+                            .text(commandText + "You now saving today records")
+                            .replyMarkup(menuService.createTwoRowReplyKeyboard(
+                                    List.of(FOOD_RECORD, IS_BLOOD, IS_PIMPLE, NOTE),
+                                    List.of(SHOW, SHOW_NOTES, EXCEL_USER_DATA)
+                            ))
                             .build();
                 }
                 case DAY_YESTERDAY -> {
                     var user = botUserService.changeTodayMode(botUser, false);
+                    var state = botUser.getUserState();
+                    String commandText = "";
+
+                    if (state.equals(INPUT_FOOD)) {
+                        commandText = "Enter food. ";
+                    }
+                    if (state.equals(INPUT_NOTE)) {
+                        commandText = "Enter note. ";
+                    }
+
+                    if (state.equals(INPUT_BLOOD_RATE)) {
+                        commandText = "How bloody? From 0 to 10. ";
+                    }
+
+                    if (state.equals(INPUT_PIMPLE_RATE_FACE)) {
+                        commandText = "How much face pimples? From 0 to 10. ";
+                    }
+
                     log.info("User " + user.getName()
                             + " changed mode to " + DAY_YESTERDAY.getCommand());
                     return SendMessage.builder()
                             .chatId(chatId)
-                            .text("You now saving yesterday records")
-                            .replyMarkup(menuService.createOneRowReplyKeyboard(RECORD, MODE, CANCEL))
+                            .text(commandText + "You now saving yesterday records")
+                            .replyMarkup(menuService.createTwoRowReplyKeyboard(
+                                    List.of(FOOD_RECORD, IS_BLOOD, IS_PIMPLE, NOTE),
+                                    List.of(SHOW, SHOW_NOTES, EXCEL_USER_DATA)
+                            ))
                             .build();
                 }
                 case FOOD_RECORD -> {
@@ -137,6 +185,10 @@ public class CommandProcessor {
                             .chatId(chatId)
                             .document(new InputFile(excelService.createExcelAllRecords(EXCEL_PATH, botUser)))
                             .caption("Your file is ready " + botUser.getName())
+                            .replyMarkup(menuService.createTwoRowReplyKeyboard(
+                                    List.of(FOOD_RECORD, IS_BLOOD, IS_PIMPLE, NOTE),
+                                    List.of(SHOW, SHOW_NOTES, EXCEL_USER_DATA)
+                            ))
                             .build();
                 }
                 case EXCEL_USER_DATA -> {
@@ -144,6 +196,10 @@ public class CommandProcessor {
                             .chatId(chatId)
                             .document(new InputFile(excelService.createExcelUserRecords(EXCEL_PATH, botUser)))
                             .caption("Your file is ready " + botUser.getName())
+                            .replyMarkup(menuService.createTwoRowReplyKeyboard(
+                                    List.of(FOOD_RECORD, IS_BLOOD, IS_PIMPLE, NOTE),
+                                    List.of(SHOW, SHOW_NOTES, EXCEL_USER_DATA)
+                            ))
                             .build();
                 }
                 case IS_BLOOD -> {
@@ -168,7 +224,7 @@ public class CommandProcessor {
                     return SendMessage.builder()
                             .chatId(chatId)
                             .text("How much pimples? From 0 to 10")
-                            .replyMarkup(menuService.createOneRowReplyKeyboard(CANCEL))
+                            .replyMarkup(menuService.createOneRowReplyKeyboard(MODE, CANCEL))
                             .build();
                 }
                 case PIMPLE_BOOTY -> {
@@ -176,7 +232,7 @@ public class CommandProcessor {
                     return SendMessage.builder()
                             .chatId(chatId)
                             .text("How much pimples? From 0 to 10")
-                            .replyMarkup(menuService.createOneRowReplyKeyboard(CANCEL))
+                            .replyMarkup(menuService.createOneRowReplyKeyboard(MODE, CANCEL))
                             .build();
                 }
                 case CANCEL -> {
@@ -201,9 +257,7 @@ public class CommandProcessor {
     private void changeState(BotUser botUser, UserState state, ServiceCommands command) {
         var day = dayService.findOrSaveDay(botUser, botUserService.selectDate(botUser));
         var user = botUserService.changeState(botUser, state);
-        log.info("User " + user.getName()
-                + " called " + command.getCommand()
-                + " on day " + day.getDate());
+        log.info("User {} called {} on day {}", user.getName(), command.getCommand(), day.getDate());
     }
 
     private String help(BotUser botUser) {
@@ -223,7 +277,7 @@ public class CommandProcessor {
     }
 
     private String unknown(String command) {
-        log.error("Unknown command: " + command);
+        log.error("Unknown command: {}", command);
         return "Unknown command! Enter /help to see available commands";
     }
 

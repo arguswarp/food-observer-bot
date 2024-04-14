@@ -4,7 +4,7 @@ services:
   app:
     image: ghcr.io/arguswarp/food-observer-bot:latest
     container_name: fobs-maven
-    mem_limit: 150m
+    mem_limit: 250m
     build:
       context: .
       dockerfile: Dockerfile

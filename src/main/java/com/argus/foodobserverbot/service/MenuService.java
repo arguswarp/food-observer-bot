@@ -53,7 +53,7 @@ public class MenuService {
                                 .text(IS_PIMPLE.getButtonName())
                                 .build(),
                         KeyboardButton.builder()
-                                .text(MODE.getButtonName())
+                                .text(NOTE.getButtonName())
                                 .build()
                 )))
                 .resizeKeyboard(true)
@@ -64,7 +64,7 @@ public class MenuService {
         return List.of(FOOD_RECORD.getButtonName(),
                 IS_BLOOD.getButtonName(),
                 IS_PIMPLE.getButtonName(),
-                MODE.getButtonName()).contains(text);
+                NOTE.getButtonName()).contains(text);
     }
 
     public String toServiceCommand(String text) {

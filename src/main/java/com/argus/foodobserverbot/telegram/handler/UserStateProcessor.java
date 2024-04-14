@@ -10,6 +10,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 
+import java.util.List;
 import java.util.function.BiConsumer;
 
 import static com.argus.foodobserverbot.entity.enums.UserState.BASIC_STATE;
@@ -37,23 +38,28 @@ public class UserStateProcessor {
             case INPUT_FOOD -> {
                 var food = foodRecordService.addFood(text, botUserService.selectDate(botUser), botUser);
                 var user = botUserService.changeState(botUser, BASIC_STATE);
-                log.info("User " + user.getName()
-                        + " new food input " + food.getFood());
+                botUserService.changeTodayMode(botUser, true);
+                log.info("User {} new food input {}", user.getName(), food.getFood());
                 return SendMessage.builder()
                         .chatId(chatId)
-                        .text("You added food record")
-                        .replyMarkup(menuService.createOneRowReplyKeyboard(FOOD_RECORD, SHOW, RECORD, CANCEL))
+                        .text("You added food record. Mode is set to today.")
+                        .replyMarkup(menuService.createTwoRowReplyKeyboard(
+                                List.of(FOOD_RECORD, IS_BLOOD, IS_PIMPLE, NOTE),
+                                List.of(SHOW, SHOW_NOTES, EXCEL_USER_DATA)
+                        ))
                         .build();
             }
             case INPUT_NOTE -> {
                 var day = dayService.addNote(text, botUserService.selectDate(botUser), botUser);
                 var user = botUserService.changeState(botUser, BASIC_STATE);
-                log.info("User " + user.getName()
-                        + " new note: " + text + "; on day " + day.getDate());
+                log.info("User {} new note: {}; on day {}", user.getName(), text, day.getDate());
                 return SendMessage.builder()
                         .chatId(chatId)
                         .text("You added note")
-                        .replyMarkup(menuService.createOneRowReplyKeyboard(NOTE, SHOW_NOTES, RECORD, CANCEL))
+                        .replyMarkup(menuService.createTwoRowReplyKeyboard(
+                                List.of(FOOD_RECORD, IS_BLOOD, IS_PIMPLE, NOTE),
+                                List.of(SHOW, SHOW_NOTES, EXCEL_USER_DATA)
+                        ))
                         .build();
             }
             case INPUT_BLOOD_RATE -> {
@@ -69,7 +75,7 @@ public class UserStateProcessor {
                         "Pimple booty rating is updated");
             }
             default -> {
-                log.error("Unknown user state " + userState);
+                log.error("Unknown user state {}", userState);
                 return SendMessage.builder()
                         .chatId(chatId)
                         .text("Unknown error! Enter /cancel and try again!")
@@ -87,15 +93,17 @@ public class UserStateProcessor {
             var date = botUserService.selectDate(botUser);
             dayService.setDayRating(rating, date, botUser, consumer);
             var user = botUserService.changeState(botUser, BASIC_STATE);
-            log.info(userState + " day rating is updated by " + user.getName()
-                    + " new value is " + rating);
+            log.info("{} day rating is updated by {} new value is {}", userState, user.getName(), rating);
             return SendMessage.builder()
                     .chatId(chatId)
                     .text(responseMessage)
+                    .replyMarkup(menuService.createTwoRowReplyKeyboard(
+                            List.of(FOOD_RECORD, IS_BLOOD, IS_PIMPLE, NOTE),
+                            List.of(SHOW, SHOW_NOTES, EXCEL_USER_DATA)
+                    ))
                     .build();
         } else {
-            log.error("Invalid input " + botUser.getUserState() + " by " + botUser.getName()
-                    + ": " + text);
+            log.error("Invalid input {} by {}: {}", botUser.getUserState(), botUser.getName(), text);
             return SendMessage.builder()
                     .chatId(chatId)
                     .text("Input is incorrect. Rating must be the number between 0 and 10. Please try again or /cancel")
