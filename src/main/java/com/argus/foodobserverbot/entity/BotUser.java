@@ -1,5 +1,6 @@
 package com.argus.foodobserverbot.entity;
 
+import com.argus.foodobserverbot.entity.enums.UserRole;
 import com.argus.foodobserverbot.entity.enums.UserState;
 import jakarta.persistence.*;
 import lombok.*;
@@ -16,16 +17,25 @@ import java.util.Objects;
 @Entity
 @Table(name = "bot_user")
 public class BotUser {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @Column(name = "name")
     private String name;
+
+    @Column(name = "user_role")
+    @Enumerated(EnumType.STRING)
+    private UserRole userRole;
+
     @Column(name = "user_state")
     @Enumerated(EnumType.STRING)
     private UserState userState;
+
     @Column(name = "telegram_id")
     private Long telegramId;
+
     @Column(name = "today_mode")
     private Boolean todayMode;
 
