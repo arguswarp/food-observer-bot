@@ -17,6 +17,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import static com.argus.foodobserverbot.entity.enums.UserRole.USER;
 import static com.argus.foodobserverbot.entity.enums.UserState.BASIC_STATE;
 
 @Service
@@ -47,10 +48,11 @@ public class BotUserService {
             BotUser transientAppUser = BotUser.builder()
                     .telegramId(telegramId)
                     .name(name)
+                    .userRole(USER)
                     .userState(BASIC_STATE)
                     .todayMode(true)
                     .build();
-            log.info("User is created: " + transientAppUser.getName() + " with id " + transientAppUser.getId());
+            log.info("User is created: {} with id {}", transientAppUser.getName(), transientAppUser.getId());
             return botUserRepository.save(transientAppUser);
         }
         return persistentBotUser;

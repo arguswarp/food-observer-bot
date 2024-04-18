@@ -35,7 +35,9 @@ public class BotConfig {
     private void addMainMenu(TelegramBot bot) {
         List<BotCommand> commandList = new ArrayList<>();
         for (ServiceCommands c : ServiceCommands.values()) {
-            commandList.add(new BotCommand(c.getCommand(), c.getDescription()));
+            if (c != ServiceCommands.EXCEL_ALL_DATA) {
+                commandList.add(new BotCommand(c.getCommand(), c.getDescription()));
+            }
         }
         try {
             bot.execute(new SetMyCommands(commandList, new BotCommandScopeDefault(), null));

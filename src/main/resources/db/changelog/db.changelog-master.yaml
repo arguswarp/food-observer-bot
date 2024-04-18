@@ -19,3 +19,5 @@ databaseChangeLog:
       file: db/changelog/changeset/9_alter-table-day.add_notes.sql
   - include:
       file: db/changelog/changeset/10_set-time-zone.sql
+  - include:
+      file: db/changelog/changeset/11_add-user-role_bot_user.sql

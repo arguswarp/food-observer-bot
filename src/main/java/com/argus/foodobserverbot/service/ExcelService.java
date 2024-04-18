@@ -35,10 +35,10 @@ public class ExcelService {
         try {
             Path filePath = preparePath(path, botUser.getName(), "all_data");
             createFileWithDirectory(filePath);
-            log.info("User " + botUser.getName() + " created excel file: " + filePath.toAbsolutePath());
+            log.info("User {} created excel file: {}", botUser.getName(), filePath.toAbsolutePath());
             return generateExcel(filePath, dayRepository.findAllByOrderByDateDesc());
         } catch (IOException e) {
-            log.error("Excel all data file error: " + e);
+            log.error("Excel all data file error: {}", e);
         }
         //TODO: find better solution
         return null;
@@ -53,7 +53,7 @@ public class ExcelService {
             var days = dayRepository.findByCreatorOrderByDateDesc(botUser);
             return generateExcel(filePath, days);
         } catch (IOException e) {
-            log.error("Excel user data file error: " + e);
+            log.error("Excel user data file error: {}", e);
         }
         //TODO: find better solution
         return null;
@@ -71,7 +71,7 @@ public class ExcelService {
                 Files.createDirectories(path.getParent());
                 Files.createFile(path);
             } catch (IOException e) {
-                log.error("Error while creating file " + e);
+                log.error("Error while creating file {}", e);
             }
         }
     }
@@ -126,11 +126,9 @@ public class ExcelService {
                 }
             }
             workbook.write(outputStream);
-            return path.toFile();
         } catch (IOException e) {
-            log.error("Excel workbook write error: " + e);
+            log.error("Excel workbook write error: {}", e);
         }
-        //TODO: find better solution
-        return null;
+        return path.toFile();
     }
 }

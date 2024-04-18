@@ -31,7 +31,7 @@ public class DayService {
                     .pimpleBootyRating(0)
                     .notes("")
                     .build();
-            log.info("User " + botUser.getName() + " started day record on " + day.getDate());
+            log.info("User {} started day record on {}", botUser.getName(), day.getDate());
             return dayRepository.save(day);
         }
         return dayRepository.findByDateAndCreator(date, botUser).orElseThrow(() -> new DatabaseException("Can't save or find day"));

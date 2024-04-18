@@ -20,6 +20,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
 
+import static com.argus.foodobserverbot.entity.enums.UserRole.ADMIN;
 import static com.argus.foodobserverbot.entity.enums.UserState.*;
 import static com.argus.foodobserverbot.telegram.enums.ServiceCommands.*;
 
@@ -181,6 +182,13 @@ public class CommandProcessor {
                             .build();
                 }
                 case EXCEL_ALL_DATA -> {
+                    if (botUser.getUserRole() != ADMIN) {
+                        return SendMessage.builder()
+                                .chatId(chatId)
+                                .text("You are not allowed to access this resource.")
+                                .replyMarkup(menuService.createOneRowReplyKeyboard(MENU))
+                                .build();
+                    }
                     return SendDocument.builder()
                             .chatId(chatId)
                             .document(new InputFile(excelService.createExcelAllRecords(EXCEL_PATH, botUser)))
@@ -239,6 +247,7 @@ public class CommandProcessor {
                     return SendMessage.builder()
                             .chatId(chatId)
                             .text(cancel(botUser))
+                            .replyMarkup(menuService.createOneRowReplyKeyboard(MENU))
                             .build();
                 }
             }
@@ -267,7 +276,7 @@ public class CommandProcessor {
         return """
                 List of available commands:\s
                 /start - start the bot
-                /record - main menu to add records
+                /menu - main menu to add records
                 /food - add food record
                 /blood - set rating for blood in the poop
                 /pimple - set rating for pimples
