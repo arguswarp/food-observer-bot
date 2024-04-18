@@ -49,7 +49,7 @@ public class CommandProcessor {
                     return SendMessage.builder()
                             .chatId(chatId)
                             .text("Hello there, " + botUser.getName() + "!"
-                                    + " Enter /help to see available commands")
+                                  + " Enter /help to see available commands")
                             .replyMarkup(menuService.createOneRowReplyKeyboard(MENU, HELP))
                             .build();
                 }
@@ -81,7 +81,7 @@ public class CommandProcessor {
                     var foodRecords = botUserService.getTodayFoodRecords(botUser);
                     var foodRecordsText = foodRecords.stream()
                             .map(foodRecord -> foodRecord.getCreatedAt()
-                                    .format(DateTimeFormatter.ofPattern("HH:mm")) + " " + foodRecord.getFood())
+                                                       .format(DateTimeFormatter.ofPattern("HH:mm")) + " " + foodRecord.getFood())
                             .reduce((s1, s2) -> s1 + "\n" + s2)
                             .orElse("No records added yet");
                     return SendMessage.builder()
@@ -131,8 +131,7 @@ public class CommandProcessor {
                         commandText = "How much face pimples? From 0 to 10. ";
                     }
 
-                    log.info("User " + user.getName()
-                            + " changed mode to " + DAY_TODAY.getCommand());
+                    getInfo(user.getName(), DAY_TODAY.getCommand(), user.getUserState());
                     return SendMessage.builder()
                             .chatId(chatId)
                             .text(commandText + "You now saving today records")
@@ -162,8 +161,7 @@ public class CommandProcessor {
                         commandText = "How much face pimples? From 0 to 10. ";
                     }
 
-                    log.info("User " + user.getName()
-                            + " changed mode to " + DAY_YESTERDAY.getCommand());
+                    getInfo(user.getName(), DAY_YESTERDAY.getCommand(), user.getUserState());
                     return SendMessage.builder()
                             .chatId(chatId)
                             .text(commandText + "You now saving yesterday records")
@@ -223,7 +221,7 @@ public class CommandProcessor {
                     return SendMessage.builder()
                             .chatId(chatId)
                             .text("Choose where the pimples "
-                                    + (botUser.getTodayMode() ? "are today" : "were yesterday"))
+                                  + (botUser.getTodayMode() ? "are today" : "were yesterday"))
                             .replyMarkup(menuService.createOneRowReplyKeyboard(PIMPLE_FACE, PIMPLE_BOOTY, CANCEL))
                             .build();
                 }
@@ -270,9 +268,7 @@ public class CommandProcessor {
     }
 
     private String help(BotUser botUser) {
-        log.info("User " + botUser.getName()
-                + " called: " + HELP.getCommand()
-                + " state is: " + botUser.getUserState());
+        getInfo(botUser.getName(), HELP.getCommand(), botUser.getUserState());
         return """
                 List of available commands:\s
                 /start - start the bot
@@ -285,6 +281,10 @@ public class CommandProcessor {
                 /excel - save your records to excel file""";
     }
 
+    private void getInfo(String name, String command, UserState state) {
+        log.info("User {} called: {}, state is: {}", name, command, state);
+    }
+
     private String unknown(String command) {
         log.error("Unknown command: {}", command);
         return "Unknown command! Enter /help to see available commands";
@@ -292,9 +292,7 @@ public class CommandProcessor {
 
     private String cancel(BotUser botUser) {
         botUserService.changeState(botUser, BASIC_STATE);
-        log.info("User " + botUser.getName()
-                + " called: " + CANCEL.getCommand()
-                + " state is: " + botUser.getUserState());
+        getInfo(botUser.getName(), CANCEL.getCommand(), botUser.getUserState());
         return "Command canceled";
     }
 }
