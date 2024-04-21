@@ -18,6 +18,8 @@ services:
       - BOT_NAME=$BOT_NAME
       - EXCEL_PATH=$EXCEL_PATH
       - TZ=$TIME_ZONE
+#    ports:
+#      - 8080:8080
     networks:
       - fobs-net
     restart: unless-stopped
