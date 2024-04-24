@@ -1,4 +1,4 @@
-version: '0.2'
+version: '0.3'
 
 services:
   app:
@@ -18,8 +18,8 @@ services:
       - BOT_NAME=$BOT_NAME
       - EXCEL_PATH=$EXCEL_PATH
       - TZ=$TIME_ZONE
-#    ports:
-#      - 8080:8080
+    ports:
+      - 8080:8080
     networks:
       - fobs-net
     restart: unless-stopped
@@ -37,6 +37,21 @@ services:
       - fobs-net
     volumes:
       - fobs_data:/var/lib/postgresql/data
+  prometheus:
+    image: prom/prometheus:v2.44.0
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+  grafana:
+    image: grafana/grafana:9.5.2
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+    volumes:
+      - ./monitoring/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
 volumes:
   fobs_data:
 networks:
