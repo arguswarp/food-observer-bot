@@ -64,7 +64,7 @@ public class UserStateProcessor {
             }
             case INPUT_BLOOD_RATE -> {
                 return processInputRating(botUser, text, chatId, (input, day) -> day.setBloodyRating(input),
-                        "Pimple blood rating is updated");
+                        "Blood rating is updated");
             }
             case INPUT_PIMPLE_RATE_FACE -> {
                 return processInputRating(botUser, text, chatId, (input, day) -> day.setPimpleFaceRating(input),

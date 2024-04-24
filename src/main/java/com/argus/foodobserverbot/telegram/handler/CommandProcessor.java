@@ -73,7 +73,7 @@ public class CommandProcessor {
                     changeState(botUser, INPUT_NOTE, NOTE);
                     return SendMessage.builder()
                             .chatId(chatId)
-                            .text("Enter note")
+                            .text("Enter note for "+ (botUser.getTodayMode() ? "today" : "yesterday"))
                             .replyMarkup(menuService.createOneRowReplyKeyboard(MODE, CANCEL))
                             .build();
                 }
@@ -108,7 +108,7 @@ public class CommandProcessor {
                     return SendMessage.builder()
                             .chatId(chatId)
                             .text("Choose the day for record")
-                            .replyMarkup(menuService.createOneRowReplyKeyboard(DAY_TODAY, DAY_YESTERDAY))
+                            .replyMarkup(menuService.createOneRowReplyKeyboard(DAY_TODAY, DAY_YESTERDAY, CANCEL))
                             .build();
                 }
                 case DAY_TODAY -> {
@@ -135,10 +135,7 @@ public class CommandProcessor {
                     return SendMessage.builder()
                             .chatId(chatId)
                             .text(commandText + "You now saving today records")
-                            .replyMarkup(menuService.createTwoRowReplyKeyboard(
-                                    List.of(FOOD_RECORD, IS_BLOOD, IS_PIMPLE, NOTE),
-                                    List.of(SHOW, SHOW_NOTES, EXCEL_USER_DATA)
-                            ))
+                            .replyMarkup(menuService.createOneRowReplyKeyboard(CANCEL))
                             .build();
                 }
                 case DAY_YESTERDAY -> {
@@ -165,10 +162,7 @@ public class CommandProcessor {
                     return SendMessage.builder()
                             .chatId(chatId)
                             .text(commandText + "You now saving yesterday records")
-                            .replyMarkup(menuService.createTwoRowReplyKeyboard(
-                                    List.of(FOOD_RECORD, IS_BLOOD, IS_PIMPLE, NOTE),
-                                    List.of(SHOW, SHOW_NOTES, EXCEL_USER_DATA)
-                            ))
+                            .replyMarkup(menuService.createOneRowReplyKeyboard(CANCEL))
                             .build();
                 }
                 case FOOD_RECORD -> {

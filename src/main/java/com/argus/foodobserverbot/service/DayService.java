@@ -38,17 +38,15 @@ public class DayService {
     }
 
     public Day setDayRating(int rating, LocalDate date, BotUser botUser, BiConsumer<Integer, Day> dayConsumer) {
-        var dayOptional = dayRepository.findByDateAndCreator(date, botUser);
-        var day = dayOptional.orElseThrow(() -> new DatabaseException("Can't find today"));
+        var day = findOrSaveDay(botUser, date);
         dayConsumer.accept(rating, day);
         return dayRepository.save(day);
     }
 
     public Day addNote(String note, LocalDate date, BotUser botUser) {
-        var dayOptional = dayRepository.findByDateAndCreator(date, botUser);
-        var day = dayOptional.orElseThrow(() -> new DatabaseException("Can't find today"));
+        var day = findOrSaveDay(botUser, date);
         String noteTransient = day.getNotes();
-        noteTransient +=note + "\n";
+        noteTransient +=note + ";" + "\n";
         day.setNotes(noteTransient);
         return dayRepository.save(day);
     }
