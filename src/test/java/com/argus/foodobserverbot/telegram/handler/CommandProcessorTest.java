@@ -4,7 +4,6 @@ import com.argus.foodobserverbot.entity.BotUser;
 import com.argus.foodobserverbot.entity.Day;
 import com.argus.foodobserverbot.service.BotUserService;
 import com.argus.foodobserverbot.service.DayService;
-import com.argus.foodobserverbot.service.MenuService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -12,7 +11,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 
 import java.time.LocalDate;
 
@@ -30,9 +28,6 @@ class CommandProcessorTest {
 
     @Mock
     private DayService dayService;
-
-    @Mock
-    private MenuService menuService;
 
     @InjectMocks
     private CommandProcessor commandProcessor;
@@ -78,8 +73,6 @@ class CommandProcessorTest {
                 Mockito.any())).thenReturn(day);
         Mockito.when(botUserService.changeState(Mockito.any(BotUser.class), Mockito.any()))
                 .thenReturn(botUser);
-        Mockito.when(menuService.createOneRowReplyKeyboard(Mockito.any()))
-                .thenReturn(ReplyKeyboardMarkup.builder().build());
 
         SendMessage sendMessage = (SendMessage) commandProcessor.process(botUser, CHAT_ID, FOOD_RECORD.getCommand());
 
