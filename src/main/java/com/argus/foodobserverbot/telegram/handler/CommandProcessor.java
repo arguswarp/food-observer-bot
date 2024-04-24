@@ -27,10 +27,15 @@ import static com.argus.foodobserverbot.telegram.enums.ServiceCommands.*;
 @Component
 @Log4j2
 public class CommandProcessor {
+
     private final BotUserService botUserService;
+
     private final DayService dayService;
+
     private final MenuService menuService;
+
     private final ExcelService excelService;
+
     @Value("${excel.path}")
     private String EXCEL_PATH;
 
@@ -207,7 +212,7 @@ public class CommandProcessor {
                     return SendMessage.builder()
                             .chatId(chatId)
                             .text("How bloody is the poop? From 0 to 10")
-                            .replyMarkup(menuService.createOneRowReplyKeyboard(CANCEL))
+                            .replyMarkup(menuService.createOneRowReplyKeyboard(MODE, CANCEL))
                             .build();
                 }
                 case IS_PIMPLE -> {

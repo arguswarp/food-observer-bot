@@ -19,10 +19,15 @@ import static com.argus.foodobserverbot.telegram.enums.ServiceCommands.*;
 @Component
 @Log4j2
 public class UserStateProcessor {
+
     private final DayService dayService;
+
     private final BotUserService botUserService;
+
     private final FoodRecordService foodRecordService;
+
     private final MenuService menuService;
+
     private static final String NUMBER_PATTERN = "^(10|[0-9])$";
 
     public UserStateProcessor(DayService dayService, BotUserService botUserService, FoodRecordService foodRecordService, MenuService menuService) {
