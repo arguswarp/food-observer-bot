@@ -8,6 +8,11 @@ spring:
     show-sql: false
   liquibase:
     enabled: true
+management:
+  endpoints:
+    web:
+      exposure:
+        include: [ "prometheus"]
 bot:
   token: ${BOT_TOKEN}
   name: ${BOT_NAME}
