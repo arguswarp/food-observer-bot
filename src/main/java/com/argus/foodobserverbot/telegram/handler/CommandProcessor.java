@@ -78,7 +78,7 @@ public class CommandProcessor {
                     changeState(botUser, INPUT_NOTE, NOTE);
                     return SendMessage.builder()
                             .chatId(chatId)
-                            .text("Enter note for "+ (botUser.getTodayMode() ? "today" : "yesterday"))
+                            .text("Enter note. Mode: "+ (botUser.getTodayMode() ? "today" : "yesterday"))
                             .replyMarkup(menuService.createOneRowReplyKeyboard(MODE, CANCEL))
                             .build();
                 }
@@ -163,6 +163,10 @@ public class CommandProcessor {
                         commandText = "How much face pimples? From 0 to 10. ";
                     }
 
+                    if (state.equals(INPUT_PIMPLE_RATE_BOOTY)) {
+                        commandText = "How much booty pimples? From 0 to 10. ";
+                    }
+
                     getInfo(user.getName(), DAY_YESTERDAY.getCommand(), user.getUserState());
                     return SendMessage.builder()
                             .chatId(chatId)
@@ -174,7 +178,7 @@ public class CommandProcessor {
                     changeState(botUser, INPUT_FOOD, FOOD_RECORD);
                     return SendMessage.builder()
                             .chatId(chatId)
-                            .text("Enter food for " + (botUser.getTodayMode() ? "today" : "yesterday"))
+                            .text("Enter food. Mode: " + (botUser.getTodayMode() ? "today" : "yesterday"))
                             .replyMarkup(menuService.createOneRowReplyKeyboard(MODE, CANCEL))
                             .build();
                 }

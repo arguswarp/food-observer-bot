@@ -47,7 +47,7 @@ public class UserStateProcessor {
                 log.info("User {} new food input {}", user.getName(), food.getFood());
                 return SendMessage.builder()
                         .chatId(chatId)
-                        .text("You added food record. Mode is set to today.")
+                        .text(String.format("You added food record. Mode: %s", getMode(botUser)))
                         .replyMarkup(menuService.createTwoRowReplyKeyboard(
                                 List.of(FOOD_RECORD, IS_BLOOD, IS_PIMPLE, NOTE),
                                 List.of(SHOW, SHOW_NOTES, EXCEL_USER_DATA)
@@ -57,10 +57,11 @@ public class UserStateProcessor {
             case INPUT_NOTE -> {
                 var day = dayService.addNote(text, botUserService.selectDate(botUser), botUser);
                 var user = botUserService.changeState(botUser, BASIC_STATE);
+                botUserService.changeTodayMode(botUser, true);
                 log.info("User {} new note: {}; on day {}", user.getName(), text, day.getDate());
                 return SendMessage.builder()
                         .chatId(chatId)
-                        .text("You added note")
+                        .text(String.format("You added note. Mode: %s", getMode(botUser)))
                         .replyMarkup(menuService.createTwoRowReplyKeyboard(
                                 List.of(FOOD_RECORD, IS_BLOOD, IS_PIMPLE, NOTE),
                                 List.of(SHOW, SHOW_NOTES, EXCEL_USER_DATA)
@@ -69,15 +70,15 @@ public class UserStateProcessor {
             }
             case INPUT_BLOOD_RATE -> {
                 return processInputRating(botUser, text, chatId, (input, day) -> day.setBloodyRating(input),
-                        "Blood rating is updated");
+                        "Blood rating is updated.");
             }
             case INPUT_PIMPLE_RATE_FACE -> {
                 return processInputRating(botUser, text, chatId, (input, day) -> day.setPimpleFaceRating(input),
-                        "Pimple face rating is updated");
+                        "Pimple face rating is updated.");
             }
             case INPUT_PIMPLE_RATE_BOOTY -> {
                 return processInputRating(botUser, text, chatId, (input, day) -> day.setPimpleBootyRating(input),
-                        "Pimple booty rating is updated");
+                        "Pimple booty rating is updated.");
             }
             default -> {
                 log.error("Unknown user state {}", userState);
@@ -98,10 +99,11 @@ public class UserStateProcessor {
             var date = botUserService.selectDate(botUser);
             dayService.setDayRating(rating, date, botUser, consumer);
             var user = botUserService.changeState(botUser, BASIC_STATE);
+            botUserService.changeTodayMode(botUser, true);
             log.info("{} day rating is updated by {} new value is {}", userState, user.getName(), rating);
             return SendMessage.builder()
                     .chatId(chatId)
-                    .text(responseMessage)
+                    .text(responseMessage + " Mode: " + getMode(botUser))
                     .replyMarkup(menuService.createTwoRowReplyKeyboard(
                             List.of(FOOD_RECORD, IS_BLOOD, IS_PIMPLE, NOTE),
                             List.of(SHOW, SHOW_NOTES, EXCEL_USER_DATA)
@@ -114,5 +116,9 @@ public class UserStateProcessor {
                     .text("Input is incorrect. Rating must be the number between 0 and 10. Please try again or /cancel")
                     .build();
         }
+    }
+
+    private String getMode(BotUser botUser) {
+        return botUser.getTodayMode() ? "today" : "yesterday";
     }
 }
