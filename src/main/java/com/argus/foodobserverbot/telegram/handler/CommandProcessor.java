@@ -245,6 +245,7 @@ public class CommandProcessor {
                             .build();
                 }
                 case CANCEL -> {
+                    botUserService.changeTodayMode(botUser, true);
                     return SendMessage.builder()
                             .chatId(chatId)
                             .text(cancel(botUser))
