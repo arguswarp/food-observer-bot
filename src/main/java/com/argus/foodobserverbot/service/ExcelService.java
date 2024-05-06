@@ -49,7 +49,7 @@ public class ExcelService {
             String name = botUser.getName();
             Path filePath = preparePath(path, name, name + "_data");
             createFileWithDirectory(filePath);
-            log.info("User " + botUser.getName() + " created excel file: " + filePath.toAbsolutePath());
+            log.info("User {} created excel file: {}", botUser.getName(), filePath.toAbsolutePath());
             var days = dayRepository.findByCreatorOrderByDateDesc(botUser);
             return generateExcel(filePath, days);
         } catch (IOException e) {
